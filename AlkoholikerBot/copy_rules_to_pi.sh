@@ -1,0 +1,1 @@
+scp -r ./rules.json cinneyyy@192.168.5.88:/home/cinneyyy/Desktop/AlkoholikerBot/rules.json

@@ -1,0 +1,247 @@
+{
+    "emoji": {
+    },
+    "channels": {
+        "memes": 1490286162135224421
+    },
+    "users": {
+        "kek": 1001192803864412291,
+        "shalom": 814460801523908619,
+        "matzel": 1066034070800314438,
+        "samu": 1392937326954545252,
+        "fabi": 364832494564016142,
+        "helena": 807608166581665792,
+        "colin": 710881909340897432,
+        "lukas": 620228563035095062
+    },
+    "defaultCooldownSeconds": 60,
+    "rules": [
+        {
+            "name": "shalom_meme_channel_vote",
+            "predicate": {
+                "channel": "memes",
+                "cooldownSeconds": 0,
+                "hasImage": true,
+                "user": "shalom"
+            },
+            "reply": {
+                "reactions": [ "~arrow_up", "~arrow_down", "~neutral_face" ],
+                "break": true
+            }
+        },
+        {
+	    "name": "meme_channel_vote",
+            "predicate": {
+                "channel": "memes",
+                "cooldownSeconds": 0,
+                "hasImage": true
+            },
+            "reply": {
+                "reactions": [ "~arrow_up", "~arrow_down" ],
+                "break": true
+            }
+        },
+        {
+	    "name": "lukas_weed",
+            "predicate": {
+                "user": "lukas",
+                "cooldownSeconds": 0
+            },
+            "reply": {
+                "reactions": [ "~:weed:1491627418144866434" ]
+            },
+            "break": false
+        },
+        {
+	    "name": "colin_gay",
+            "predicate": {
+                "user": "colin",
+                "cooldownSeconds": 0
+            },
+            "reply": {
+                "reactions": [ "~rainbow_flag" ]
+            },
+            "break": false
+        },
+        {
+            "name": "colin_reply",
+            "predicate": {
+                "user": "colin",
+                "chance": 0.1,
+                "cooldownSeconds": 60
+            },
+            "replies": [
+                {
+                    "text": "$insult$",
+                    "refMessage": true,
+                    "snippets": {
+                        "insult": [
+                            "Halt's Maul.",
+                            "Ficken Sie sich.",
+                            "Wieso hast du mich geschaffen; womit habe ich es verdient?",
+                            "Ich hasse dich.",
+                            "Hs.",
+                            "Leck meine Eier.",
+                            "Homo",
+                            "^ :~rainbow_flag::~:bi:1496242690906394714: is talking ^"
+                        ]
+                    }
+                },
+                { "reactions": [ "~middle_finger" ], "weight": 0.5 },
+                { "attachment": "res/markifire.gif", "refMessage": true, "weight": 0.25 }
+            ]
+        },
+        {
+	    "name": "alkoholiker",
+            "predicate": {
+                "regex": "(alk(?:ohol)?|[vw]odka|schnaps|pfeffi|berliner luft|whisk(?:e)?y|li(?:kö|queu)r|[a-z]*bier|[a-z]*wein)",
+                "regexIgnoreCase": true,
+                "cooldownSeconds": 5
+            },
+            "replies": [
+                { "text": "Hat jemand Alkohol gesagt?" },
+                { "text": "A-a.. Alkohool..." },
+                { "text": "Alkohol?" },
+                { "text": "Mmmmm, lekker Bööörchen!","weight": 0.5 },
+                { "text": "Wo ist %1%?", "refMessage": true, "weight": 1.25 },
+                { "attachment": "res/beer.jpg", "refMessage": true, "weight": 0.5 },
+                { "reactions": [ "~beer", "~beers", "~wine_glass", "~champagne", "~champagne_glass", "~:berlinerluft:1494149299100061889", "~:likoer43:1494149448467742721", "~:rothaus:1494149120754192415", "~:vodka:1494149467044057251", "~:parkbraeu:1494149518902558963", "~:vodka2:1494149491794907356" ], "weight": 1.5 }
+            ]
+        },
+        {
+	    "name": "shalom_replies",
+            "predicate": {
+                "user": "shalom",
+                "chance": 0.1,
+                "hasImage": false,
+                "cooldownSeconds": 900
+            },
+            "replies": [
+                { "text": "^ Kohlenstoffmonoxid is talking ^" },
+                { "text": "Shalom!", "refMessage": true },
+                { "text": "Was laberst du?", "refMessage": true },
+                { "attachment": "res/maxim_lebenslauf.png", "weight": 0.33 }
+            ]
+        },
+        {
+	    "name": "matzel_message",
+            "predicate": {
+                "user": "matzel",
+                "chance": 0.25,
+                "cooldownSeconds": 900
+            },
+            "reply": {
+                "text": "$msg$",
+                "snippets": {
+                    "msg": [
+                        "Hallo Matzel!",
+                        "Moooin Morzel!",
+                        "Rede :~pray::~pray::~speaking_head::~speaking_head:",
+                        "Gesprochen wie ein Löwe, Marcello.",
+                        "?",
+                        "Sei vorsichtig was du da sagst"
+                    ]
+                },
+                "refMessage": true
+            }
+        },
+        {
+	    "name": "samu_response",
+            "predicate": {
+                "user": "samu",
+                "chance": 0.125,
+                "cooldownSeconds": 180
+            },
+            "replies": [
+                {
+                    "text": "\"$quote$\" - Samu 2025",
+                    "snippets": {
+                        "quote": [
+                            "Ich bin zu Frau Rempe, was Heinrich Himmler zu Hitler war.",
+                            "Du darfst das nicht zu viel liken, Mäxim, ich krieg nur noch Hitler."
+                        ]
+                    }
+                },
+                {
+                    "text": "Hat mein Opa auch immer gesagt :~100:",
+                    "refMessage": true
+                }
+            ]
+        },
+        {
+            "name": "helena_response",
+            "predicate": {
+                "user": "helena",
+                "chance": 0.15
+            },
+            "replies": [
+                { "text": "https://en.wikipedia.org/wiki/Discrimination_against_people_with_red_hair", "weight": 0.5 },
+                { "reactions": [ "~woman_red_haired" ] },
+                { "text": "Hallo Frau Kunst LK, guck mal was ich gemalt habe :3", "attachment": "res/kunstwerk.png" },
+                { "text": "Grüß Siegfriedolin von mir!", "weight": 0.75 }
+            ]
+        },
+        {
+	    "name": "kek_fun_fact_reaction",
+            "predicate": {
+                "user": "kek",
+                "refMessage": true,
+                "cooldownSeconds": 0
+            },
+            "reply": {
+                "reactions": [ "~fire" ]
+            },
+            "break": true
+        },
+        {
+	    "name": "kek_fun_fact",
+            "predicate": {
+                "user": "kek",
+                "chance": 0.075,
+                "cooldownSeconds": 300
+            },
+            "reply": {
+                "text": "@kek@, krieg ich bitti einen Fun Fact über $topic$?",
+                "snippets": {
+                    "topic": [ "das Weltall", "Rinnthal", "deine Mutter", "Fun Facts", "Aliens", "Die Spannungen Ost/West zwischen 1945 und 1991", "Bayern", "mich", "Alan Turing", "CMYK", "Joe Biden", "Artemis II", "den Moooooond", "Adolf Hitler", "Till Schweiger", "Matrix Multiplikation", "Topologie", "das Römische Reich", "das Antike Griechenland", "das Antike Ägypten", "Kapitalismus", "Maxims linke Arschbacke", "Hitlers Hoden", "dein Alkoholproblem", "Bier", "Alkohol", "das Standardmodell", "Quantenmechanik" ]
+                }
+            }
+        },
+        {
+	    "name": "fabi_response",
+            "predicate": {
+                "user": "fabi",
+                "chance": 0.1,
+                "cooldownSeconds": 300
+            },
+            "reply": {
+                "attachment": "res/fabi/",
+                "refMessage": true
+            }
+        },
+        {
+	    "name": "darf_er_so_poll",
+            "predicate": {
+                "chance": 0.0025,
+                "cooldownSeconds": 3600
+            },
+            "reply": {
+                "poll": {
+                    "question": { "text": "Darf er so?" },
+                    "answers": [
+                        {
+                            "text": "Ja",
+                            "emoji": "~lion_face"
+                        },
+                        {
+                            "text": "Nein",
+                            "emoji": "~pensive"
+                        }
+                    ],
+                    "multiselect": false,
+                    "hours": 1
+                }
+            }
+        }
+    ]
+}
