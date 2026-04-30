@@ -35,7 +35,10 @@ public class Program
 
         services = new ServiceCollection()
             .AddSingleton(client)
-            .AddSingleton(service => new InteractionService(service.GetRequiredService<DiscordSocketClient>()))
+            .AddSingleton(service => new InteractionService(service.GetRequiredService<DiscordSocketClient>(), new() 
+            { 
+                DefaultRunMode = RunMode.Async
+            }))
             .BuildServiceProvider();
 
         InteractionService interactions = services.GetRequiredService<InteractionService>();

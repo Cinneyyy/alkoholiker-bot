@@ -69,7 +69,7 @@ public readonly partial record struct Reply()
 
 
     [GeneratedRegex("@([a-z0-9\\-_]+)@")] private static partial Regex FormatMentionRegex();
-    [GeneratedRegex(":([a-z0-9\\-_~]+):")] private static partial Regex EmojiRegex();
+    [GeneratedRegex(":([a-z0-9\\-_~;]+):")] private static partial Regex EmojiRegex();
     [GeneratedRegex("\\$([a-z0-9\\-_]+)\\$")] private static partial Regex SnippetRegex();
     [GeneratedRegex("%([0-9]+)%")] private static partial Regex RegexRegex();
 }

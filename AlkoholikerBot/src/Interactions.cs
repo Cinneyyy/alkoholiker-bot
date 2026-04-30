@@ -102,6 +102,25 @@ public sealed class Interactions : InteractionModuleBase<SocketInteractionContex
         // );
     }
 
+    [SlashCommand("reloadrules", "Unload and reload all rules.")]
+    public async Task ReloadRules(string password)
+    {
+        if(Environment.GetEnvironmentVariable("ADMIN_PASSWORD") != password)
+        {
+            await RespondAsync("Invalid password.", ephemeral: true, flags: MessageFlags.SuppressNotification);
+            return;
+        }
+
+        RuleMgr.rules.UnloadAll();
+        RuleMgr.rules.Load(File.ReadAllText("rules.json"));
+         
+        string[] files = Directory.GetFiles("rules", "*.json");
+        foreach(string path in files)
+            RuleMgr.rules.Load(File.ReadAllText(path));
+        
+        await RespondAsync($"Loaded the following rule files: {string.Join(", ", files.Select(Path.GetFileName))}", ephemeral: true, flags: MessageFlags.SuppressNotification);
+    }
+
     [SlashCommand("optout", "Opt out of receiving bot responses.")]
     public async Task OptOut()
         => await RespondWithModalAsync(new ModalBuilder()
