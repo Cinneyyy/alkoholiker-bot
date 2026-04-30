@@ -20,14 +20,14 @@ public sealed class Interactions : InteractionModuleBase<SocketInteractionContex
             ? $"{timeSpan.Days}:{timeSpan:hh\\:mm\\:ss}"
             : $"{timeSpan:hh\\:mm\\:ss}";
 
-        await RespondAsync(text: $"The bot has been running for {timeSpanStr}.", ephemeral: ephemeral);
+        await RespondAsync(text: $"The bot has been running for {timeSpanStr}.", ephemeral: ephemeral, flags: MessageFlags.SuppressNotification);
     }
 
     [SlashCommand("ping", "Ping the bot and display the time it takes for the bot to send a message and receive the ACK.")]
     public async Task Ping(bool ephemeral = true)
     {
         DateTime start = DateTime.UtcNow;
-        await RespondAsync(text: "Pong!", ephemeral: ephemeral);
+        await RespondAsync(text: "Pong!", ephemeral: ephemeral, flags: MessageFlags.SuppressNotification);
 
         string newMessage = $"Pong! ({(DateTime.UtcNow - start).TotalMilliseconds:0}ms)";
         await ModifyOriginalResponseAsync(msg => msg.Content = newMessage);
@@ -52,7 +52,7 @@ public sealed class Interactions : InteractionModuleBase<SocketInteractionContex
             string path = Random.Shared.Next(i32.MaxValue).ToString();
             File.WriteAllText(path, sb.ToString());
 
-            await RespondWithFileAsync(path, fileName: "rules.txt", ephemeral: ephemeral);
+            await RespondWithFileAsync(path, fileName: "rules.txt", ephemeral: ephemeral, flags: MessageFlags.SuppressNotification);
 
             File.Delete(path);
         }
@@ -64,7 +64,7 @@ public sealed class Interactions : InteractionModuleBase<SocketInteractionContex
 
     [SlashCommand("rulesjson", "Retrieve the raw rules.json file.")]
     public async Task RulesJson(bool ephemeral = true)
-        => await RespondWithFileAsync("rules.json", fileName: "rules.json", ephemeral: ephemeral);
+        => await RespondWithFileAsync("rules.json", fileName: "rules.json", ephemeral: ephemeral, flags: MessageFlags.SuppressNotification);
         
     [SlashCommand("janein", "Create a poll with yes/no response options.")]
     public async Task YesNo(string question, bool maybe = false, u32 durationHours = 1u)

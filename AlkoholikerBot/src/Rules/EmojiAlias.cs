@@ -17,6 +17,8 @@ public readonly record struct EmojiAlias()
     {
         this.alias = alias;
 
+        value = value.Replace(';', ':');
+
         if(!value.Contains(':'))
             name = value;
         else
