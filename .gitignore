@@ -399,3 +399,5 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 /MV/src/Editor/LevelEditor.cs
+
+AlkoholikerBot/.env
