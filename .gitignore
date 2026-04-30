@@ -400,4 +400,4 @@ FodyWeavers.xsd
 *.sln.iml
 /MV/src/Editor/LevelEditor.cs
 
-AlkoholikerBot/.env
+**/.env
