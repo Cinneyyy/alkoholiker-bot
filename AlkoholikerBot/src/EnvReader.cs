@@ -8,7 +8,10 @@ public static class EnvReader
     public static void Load(string filePath)
     {
         if(!File.Exists(filePath))
+        {
+            Console.WriteLine($"File path does not exist: {Path.GetFullPath(filePath)}");   
             return;
+        }
 
         foreach(string line in File.ReadAllLines(filePath))
         {

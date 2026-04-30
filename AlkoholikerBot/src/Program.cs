@@ -13,18 +13,19 @@ namespace src;
 
 public class Program
 {
-    public static readonly string dataPath = File.ReadAllLines("datapath.txt").First();
 
     private DiscordSocketClient client;
     private IServiceProvider services;
 
 
     public static DateTime startTime { get; private set; }
+    public static string dataPath { get; private set; }
     public static string timeStr => DateTime.Now.ToString("yyyy'-'MM'-'dd HH':'mm':'ss");
 
 
     private async Task RunBotAsync()
     {
+        dataPath = File.ReadAllLines("datapath.txt").First();
         startTime = DateTime.UtcNow;
 
         EnvReader.Load($"{dataPath}/.env");
@@ -101,41 +102,6 @@ public class Program
 
         client.MessageDeleted += async (message, channel)
             => Console.WriteLine($"[{timeStr}] Message deleted in {channel.Value?.Name ?? "[unknown channel]"} ({FormatMessage(message.Value)})");
-
-        new Thread(() =>
-        {
-            while(true)
-            {
-                try
-                {
-                    Console.WriteLine("Keys: unloadRules, loadRules[=path], reloadRules[=path], logFailure=bool");
-
-                    string input = Console.ReadLine();
-                    switch(input.ToLowerInvariant())
-                    {
-                        case "unloadrules": RuleMgr.rules.UnloadAll(); continue;
-                        case "loadrules": input = "loadRules=rules.json"; break;
-                        case "reloadrules": input = "reloadrules=rules.json"; break;
-                    }
-
-                    string[] kv = input.Split('=');
-                    switch(kv[0].ToLowerInvariant())
-                    {
-                        case "loadrules": RuleMgr.rules.Load(File.ReadAllText(kv[1])); break;
-                        case "reloadrules": RuleMgr.rules.UnloadAll(); RuleMgr.rules.Load(File.ReadAllText(kv[1])); break;
-                        case "logfailure": RuleMgr.logFailure = kv[1].Equals("true", StringComparison.InvariantCultureIgnoreCase); break;
-                        default: Console.WriteLine($"Failed to parse key."); break;
-                    }
-                }
-                catch(Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                }
-            }
-        })
-        {
-            IsBackground = true
-        }.Start();
 
         AppDomain.CurrentDomain.ProcessExit += async (_, _) => await client.StopAsync();
 
