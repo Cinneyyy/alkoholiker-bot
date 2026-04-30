@@ -88,7 +88,7 @@
                     }
                 },
                 { "reactions": [ "~middle_finger" ], "weight": 0.5 },
-                { "attachment": "res/markifire.gif", "refMessage": true, "weight": 0.25 }
+                { "attachment": "markifire.gif", "refMessage": true, "weight": 0.25 }
             ]
         },
         {
@@ -104,7 +104,7 @@
                 { "text": "Alkohol?" },
                 { "text": "Mmmmm, lekker Bööörchen!","weight": 0.5 },
                 { "text": "Wo ist %1%?", "refMessage": true, "weight": 1.25 },
-                { "attachment": "res/beer.jpg", "refMessage": true, "weight": 0.5 },
+                { "attachment": "beer.jpg", "refMessage": true, "weight": 0.5 },
                 { "reactions": [ "~beer", "~beers", "~wine_glass", "~champagne", "~champagne_glass", "~:berlinerluft:1494149299100061889", "~:likoer43:1494149448467742721", "~:rothaus:1494149120754192415", "~:vodka:1494149467044057251", "~:parkbraeu:1494149518902558963", "~:vodka2:1494149491794907356" ], "weight": 1.5 }
             ]
         },
@@ -120,7 +120,7 @@
                 { "text": "^ Kohlenstoffmonoxid is talking ^" },
                 { "text": "Shalom!", "refMessage": true },
                 { "text": "Was laberst du?", "refMessage": true },
-                { "attachment": "res/maxim_lebenslauf.png", "weight": 0.33 }
+                { "attachment": "maxim_lebenslauf.png", "weight": 0.33 }
             ]
         },
         {
@@ -177,7 +177,7 @@
             "replies": [
                 { "text": "https://en.wikipedia.org/wiki/Discrimination_against_people_with_red_hair", "weight": 0.5 },
                 { "reactions": [ "~woman_red_haired" ] },
-                { "text": "Hallo Frau Kunst LK, guck mal was ich gemalt habe :3", "attachment": "res/kunstwerk.png" },
+                { "text": "Hallo Frau Kunst LK, guck mal was ich gemalt habe :3", "attachment": "kunstwerk.png" },
                 { "text": "Grüß Siegfriedolin von mir!", "weight": 0.75 }
             ]
         },
@@ -215,7 +215,7 @@
                 "cooldownSeconds": 300
             },
             "reply": {
-                "attachment": "res/fabi/",
+                "attachment": "fabi/",
                 "refMessage": true
             }
         },

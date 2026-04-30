@@ -10,7 +10,7 @@ public static class OptOutMgr
 
 
     static OptOutMgr()
-        => optedOut = [..File.ReadAllLines("optout.txt").Select(u64.Parse)];
+        => optedOut = [..File.ReadAllLines($"{Program.dataPath}/optout.txt").Select(u64.Parse)];
 
 
     public static bool IsOptedOut(u64 id)
@@ -22,7 +22,7 @@ public static class OptOutMgr
             return false;
 
         optedOut.Add(id);
-        File.WriteAllLines("optout.txt", [..optedOut.Select(id => id.ToString())]);
+        File.WriteAllLines($"{Program.dataPath}/optout.txt", [..optedOut.Select(id => id.ToString())]);
         return true;
     }
 
@@ -31,7 +31,7 @@ public static class OptOutMgr
         if(!optedOut.Remove(id))
             return false;
 
-        File.WriteAllLines("optout.txt", [..optedOut.Select(id => id.ToString())]);
+        File.WriteAllLines($"{Program.dataPath}/optout.txt", [..optedOut.Select(id => id.ToString())]);
         return true;
     }
 }

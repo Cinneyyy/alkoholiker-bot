@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Interactions;
@@ -64,7 +66,7 @@ public sealed class Interactions : InteractionModuleBase<SocketInteractionContex
 
     [SlashCommand("rulesjson", "Retrieve the raw rules.json file.")]
     public async Task RulesJson(bool ephemeral = true)
-        => await RespondWithFileAsync("rules.json", fileName: "rules.json", ephemeral: ephemeral, flags: MessageFlags.SuppressNotification);
+        => await RespondWithFilesAsync(Directory.GetFiles($"{Program.dataPath}/rules", "*.json").Append($"{Program.dataPath}/rules.json").Select(f => new FileAttachment(f, Path.GetFileName(f))), ephemeral: ephemeral, flags: MessageFlags.SuppressNotification);
         
     [SlashCommand("janein", "Create a poll with yes/no response options.")]
     public async Task YesNo(string question, bool maybe = false, u32 durationHours = 1u)
@@ -112,13 +114,51 @@ public sealed class Interactions : InteractionModuleBase<SocketInteractionContex
         }
 
         RuleMgr.rules.UnloadAll();
-        RuleMgr.rules.Load(File.ReadAllText("rules.json"));
+        RuleMgr.rules.Load(File.ReadAllText($"{Program.dataPath}/rules.json"));
          
-        string[] files = Directory.GetFiles("rules", "*.json");
+        string[] files = Directory.GetFiles($"{Program.dataPath}/rules", "*.json");
         foreach(string path in files)
             RuleMgr.rules.Load(File.ReadAllText(path));
         
-        await RespondAsync($"Loaded the following rule files: {string.Join(", ", files.Select(Path.GetFileName))}", ephemeral: true, flags: MessageFlags.SuppressNotification);
+        await RespondAsync($"Loaded the following rule files: [{string.Join(", ", files.Select(Path.GetFileName).Append("rules.json"))}]", ephemeral: true, flags: MessageFlags.SuppressNotification);
+    }
+
+    [SlashCommand("addrule", "Create a new rule to which the bot will adhere.")]
+    public async Task AddRule(string name, f32 chance = 1f, string regex = null, bool regexIgnoreCase = false, string channel = null, string user = null, i32 cooldownSeconds = -1, bool? refMessage = null, bool? hasImage = null, string text = null, string emoji = null, string reaction = null, bool silent = true, bool refReplyMessage = false, bool @break = false)
+    {
+        Predicate predicate = new()
+        {
+            chance = chance,
+            regex = regex,
+            regexIgnoreCase = false,
+            channel = channel,
+            user = user,
+            cooldownSeconds = cooldownSeconds,
+            refMessage = refMessage,
+            hasImage = hasImage
+        };
+
+        Reply reply = new()
+        {
+            text = text,
+            emoji = emoji,
+            reactions = reaction is null ? [] : [reaction],
+            silent = silent,
+            refMessage = refReplyMessage
+        };
+
+        Rule rule = new()
+        {
+            name = name,
+            predicate = predicate,
+            reply = reply,
+            @break = @break
+        };
+
+        string json = JsonSerializer.Serialize(rule);
+        File.WriteAllText($"{Program.dataPath}/rules/{name}.json", $"{{\"rules\":[{json}]}}");
+
+        await RespondAsync($"```{rule.ToString("- ")}\n```", ephemeral: true, flags: MessageFlags.SuppressNotification);
     }
 
     [SlashCommand("optout", "Opt out of receiving bot responses.")]
@@ -127,7 +167,8 @@ public sealed class Interactions : InteractionModuleBase<SocketInteractionContex
             .WithTitle("Opt in/out")
             .WithCustomId("optout_modal")
             .AddCheckBox("Receive bot responses", new CheckboxBuilder().WithCustomId("optin_cb").WithDefaultState(false))
-            .Build());
+            .Build()
+        );
 
     [SlashCommand("optin", "Opt into receiving bot responses.")]
     public async Task OptIn()
@@ -135,5 +176,6 @@ public sealed class Interactions : InteractionModuleBase<SocketInteractionContex
             .WithTitle("Opt in/out")
             .WithCustomId("optout_modal")
             .AddCheckBox("Receive bot responses", new CheckboxBuilder().WithCustomId("optin_cb").WithDefaultState(true))
-            .Build());
+            .Build()
+        );
 }

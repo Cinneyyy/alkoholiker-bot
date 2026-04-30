@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace src.Rules;
@@ -18,8 +19,8 @@ public readonly partial record struct Reply()
     public Dictionary<string, string[]> snippets { get; init; } = [];
     public f32 weight { get; init; } = 1f;
     public string[] attachments { get; init; } = [];
-    public string attachment { init => attachments = [value]; }
-    public readonly string randomAttachment => attachments.Length == 1 && Directory.Exists(attachments.First())
+    [JsonIgnore] public string attachment { init => attachments = [value]; }
+    [JsonIgnore] public readonly string randomAttachment => attachments.Length == 1 && Directory.Exists(attachments.First())
         ? Directory.GetFiles(attachments.First(), "*.*", SearchOption.AllDirectories).SelectRandom()
         : attachments.SelectRandom();
 
@@ -68,7 +69,7 @@ public readonly partial record struct Reply()
     }
 
 
-    [GeneratedRegex("@([a-z0-9\\-_]+)@")] private static partial Regex FormatMentionRegex();
+    [GeneratedRegex("@([a-z0-9\\-_~]+)@")] private static partial Regex FormatMentionRegex();
     [GeneratedRegex(":([a-z0-9\\-_~;]+):")] private static partial Regex EmojiRegex();
     [GeneratedRegex("\\$([a-z0-9\\-_]+)\\$")] private static partial Regex SnippetRegex();
     [GeneratedRegex("%([0-9]+)%")] private static partial Regex RegexRegex();

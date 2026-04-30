@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,8 @@ namespace src;
 
 public class Program
 {
+    public static readonly string dataPath = File.ReadAllLines("datapath.txt").First();
+
     private DiscordSocketClient client;
     private IServiceProvider services;
 
@@ -24,8 +27,8 @@ public class Program
     {
         startTime = DateTime.UtcNow;
 
-        EnvReader.Load(".env");
-        RuleMgr.rules.Load(File.ReadAllText("rules.json"));
+        EnvReader.Load($"{dataPath}/.env");
+        RuleMgr.rules.Load(File.ReadAllText($"{dataPath}/rules.json"));
 
         client = new DiscordSocketClient(new DiscordSocketConfig()
         {

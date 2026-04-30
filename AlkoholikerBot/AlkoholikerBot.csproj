@@ -12,19 +12,9 @@
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <None Update=".env">
+    	<ItemGroup>
+	  <None Update="datapath.txt">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-      <None Update="rules.json">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>     
-      <None Update="optout.txt">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-      <None Update="res\**">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-	</ItemGroup>
-
+      </ItemGroup>
 </Project>

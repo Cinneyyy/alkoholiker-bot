@@ -25,10 +25,20 @@ public sealed class RuleCollection
 
 
     public ChannelAlias? GetChannel(string alias)
-        => channels.FindAll(c => c.alias == alias).First();
+    {
+        if(alias.StartsWith('~'))
+            return new() { alias = "", id = u64.Parse(alias[1..]) };
+        else
+            return channels.FindAll(c => c.alias == alias).First();
+    }
 
     public UserAlias GetUser(string alias)
-        => users.FindAll(u => u.alias == alias).First();
+    {
+        if(alias.StartsWith('~'))
+            return new() { alias = "", id = u64.Parse(alias[1..]) };
+        else
+            return users.FindAll(u => u.alias == alias).First();
+    }
 
     public IEmote GetEmoji(string alias)
     {

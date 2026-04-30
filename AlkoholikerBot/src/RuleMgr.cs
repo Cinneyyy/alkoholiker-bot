@@ -127,7 +127,7 @@ public static partial class RuleMgr
                         text = reply.FormatText(rules, match);
                     }
 
-                    if(reply.attachments is not [] && reply.randomAttachment is string att && File.Exists(att))
+                    if(reply.attachments is not [] && reply.randomAttachment is string att && File.Exists($"{Program.dataPath}/res/{att}"))
                     {
                         await msg.Channel.SendFileAsync(
                             filePath: att,

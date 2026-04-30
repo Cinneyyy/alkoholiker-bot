@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace src.Rules;
 
 public readonly record struct Predicate()
 {
-    public i32 predicateId { get; } = Random.Shared.Next();
+    [JsonIgnore] public i32 predicateId { get; } = Random.Shared.Next();
     public f32 chance { get; init; } = 1f;
     public string regex { get; init; } = null;
     public bool regexIgnoreCase { get; init; }
@@ -26,7 +27,7 @@ public readonly record struct Predicate()
         if(!string.IsNullOrEmpty(regex)) sb.AppendLine($"{lnPrefix}regex: /{regex}/ (ignore case: {regexIgnoreCase})");
         if(!string.IsNullOrEmpty(user)) sb.AppendLine($"{lnPrefix}user: {user}");
         if(!string.IsNullOrEmpty(channel)) sb.AppendLine($"{lnPrefix}channel: {channel}");
-        if(cooldownSeconds != 0) sb.AppendLine($"{lnPrefix}cooldown: {(cooldownSeconds < 0 ? $"{RuleMgr.rules.defaultCooldownSeconds}s (default)" : $"{cooldownSeconds}s")}");
+        sb.AppendLine($"{lnPrefix}cooldown: {GetActualCooldown(RuleMgr.rules)}s{(GetActualCooldown(RuleMgr.rules) == RuleMgr.rules.defaultCooldownSeconds ? " (default)" : "")}");
         if(refMessage is not null) sb.AppendLine($"{lnPrefix}is reply: {refMessage.Value}");
         if(hasImage is not null) sb.AppendLine($"{lnPrefix}has image: {hasImage.Value}");
 
