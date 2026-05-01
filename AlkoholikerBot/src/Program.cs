@@ -54,7 +54,7 @@ public class Program
 #if RELEASE
         client.Ready += async () => await interactions.RegisterCommandsGloballyAsync();
 #elif DEBUG
-        client.Ready += async () => await interactions.RegisterCommandsToGuildAsync(710882470702088242ul);
+        client.Ready += async () => await interactions.RegisterCommandsToGuildAsync(u64.Parse(Environment.GetEnvironmentVariable("DEBUG_GUILD")));
 #endif
 
         client.ModalSubmitted += ModalHandler.Handle;

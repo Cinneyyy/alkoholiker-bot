@@ -19,7 +19,7 @@ public readonly partial record struct Reply()
     public Dictionary<string, string[]> snippets { get; init; } = [];
     public f32 weight { get; init; } = 1f;
     public string[] attachments { get; init; } = [];
-    [JsonIgnore] public string attachment { init => attachments = [value]; }
+    public string attachment { init => attachments = [value]; }
     [JsonIgnore] public readonly string randomAttachment => attachments.Length == 1 && Directory.Exists(attachments.First())
         ? Directory.GetFiles(attachments.First(), "*.*", SearchOption.AllDirectories).SelectRandom()
         : attachments.SelectRandom();

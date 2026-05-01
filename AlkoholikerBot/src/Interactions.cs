@@ -104,7 +104,7 @@ public sealed class Interactions : InteractionModuleBase<SocketInteractionContex
         // );
     }
 
-    [SlashCommand("reloadrules", "Unload and reload all rules.")]
+    [SlashCommand("reloadrules", "Admin command; unload and reload all rules.")]
     public async Task ReloadRules(string password)
     {
         if(Environment.GetEnvironmentVariable("ADMIN_PASSWORD") != password)
@@ -123,43 +123,28 @@ public sealed class Interactions : InteractionModuleBase<SocketInteractionContex
         await RespondAsync($"Loaded the following rule files: [{string.Join(", ", files.Select(Path.GetFileName).Append("rules.json"))}]", ephemeral: true, flags: MessageFlags.SuppressNotification);
     }
 
-    [SlashCommand("addrule", "Create a new rule to which the bot will adhere.")]
-    public async Task AddRule(string name, f32 chance = 1f, string regex = null, bool regexIgnoreCase = false, string channel = null, string user = null, i32 cooldownSeconds = -1, bool? refMessage = null, bool? hasImage = null, string text = null, string emoji = null, string reaction = null, bool silent = true, bool refReplyMessage = false, bool @break = false)
+    [SlashCommand("togglefailurelog", "Admin command; toggles logging of each rule that failed into the console")]
+    public async Task ToggleFailureLog(string password, bool value)
     {
-        Predicate predicate = new()
+        if(Environment.GetEnvironmentVariable("ADMIN_PASSWORD") != password)
         {
-            chance = chance,
-            regex = regex,
-            regexIgnoreCase = false,
-            channel = channel,
-            user = user,
-            cooldownSeconds = cooldownSeconds,
-            refMessage = refMessage,
-            hasImage = hasImage
-        };
+            await RespondAsync("Invalid password.", ephemeral: true, flags: MessageFlags.SuppressNotification);
+            return;
+        }
 
-        Reply reply = new()
-        {
-            text = text,
-            emoji = emoji,
-            reactions = reaction is null ? [] : [reaction],
-            silent = silent,
-            refMessage = refReplyMessage
-        };
-
-        Rule rule = new()
-        {
-            name = name,
-            predicate = predicate,
-            reply = reply,
-            @break = @break
-        };
-
-        string json = JsonSerializer.Serialize(rule);
-        File.WriteAllText($"{Program.dataPath}/rules/{name}.json", $"{{\"rules\":[{json}]}}");
-
-        await RespondAsync($"```{rule.ToString("- ")}\n```", ephemeral: true, flags: MessageFlags.SuppressNotification);
+        RuleMgr.logFailure = value;
+        await RespondAsync($"RuleMgr.logFailure is now set to {value}.", ephemeral: true, flags: MessageFlags.SuppressNotification);
     }
+
+    [SlashCommand("scheresteinpapier", "Lock in a bet for rock paper scissors and reveal all using the reveal button.")]
+    public async Task RockPaperScissors()
+        => await RespondAsync(components: new ComponentBuilder()
+            .WithButton(Emoji.Parse(":rock:").ToString(), "rock")
+            .WithButton(Emoji.Parse(":roll_of_paper:").ToString(), "paper")
+            .WithButton(Emoji.Parse(":scissors:").ToString(), "scissors")
+            .WithButton("Fertig", "reveal")
+            .Build()
+        );
 
     [SlashCommand("optout", "Opt out of receiving bot responses.")]
     public async Task OptOut()
