@@ -11,12 +11,12 @@ namespace src;
 
 public static partial class RuleMgr
 {
-    public static readonly u64 botUserId = u64.Parse(Environment.GetEnvironmentVariable("BOT_USER_ID"));
     public static readonly RuleCollection rules = new();
 
     private static readonly Dictionary<i32, DateTime> cooldowns = [];
 
 
+    public static u64 botUserId => u64.Parse(Environment.GetEnvironmentVariable("BOT_USER_ID"));
     public static bool logFailure { get; set; }
 
 

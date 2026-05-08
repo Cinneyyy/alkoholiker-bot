@@ -2,18 +2,26 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Interactions;
+using Discord.WebSocket;
 using src.Rules;
 
 namespace src;
 
 public sealed class Interactions : InteractionModuleBase<SocketInteractionContext>
 {
+    public static readonly Dictionary<u64, DateTime> spamCooldowns = [];
+
+
+    public static i32 spamCooldownSeconds { get; set; } = i32.Parse(Environment.GetEnvironmentVariable("SPAM_COOLDOWN_SECONDS"));
+
+
     [SlashCommand("uptime", "Retrieve the amount of time for which the current bot session has been running.")]
     public async Task Uptime(bool ephemeral = true)
     {
@@ -104,36 +112,35 @@ public sealed class Interactions : InteractionModuleBase<SocketInteractionContex
         // );
     }
 
-    [SlashCommand("reloadrules", "Admin command; unload and reload all rules.")]
-    public async Task ReloadRules(string password)
+    [SlashCommand("spam", "Spam a pinged user to check out a certain message or channel.")]
+    public async Task Spam(IUser user, [MinValue(1), MaxValue(23)] u32 messageCount, string message = null, bool ephemeral = true)
     {
-        if(Environment.GetEnvironmentVariable("ADMIN_PASSWORD") != password)
+        DateTime now = DateTime.UtcNow;
+
+        if(spamCooldowns.TryGetValue(user.Id, out DateTime time))
         {
-            await RespondAsync("Invalid password.", ephemeral: true, flags: MessageFlags.SuppressNotification);
-            return;
+            if((now - time).TotalSeconds < spamCooldownSeconds)
+            {
+                await RespondAsync($"Failed to spam {user.Mention}, as the cooldown has not expired yet ({((now - time).Subtract(TimeSpan.FromSeconds((i64)spamCooldownSeconds))).ToString("hh':'mm':'ss")} left).", ephemeral: ephemeral, flags: MessageFlags.SuppressNotification);
+                return;
+            }
         }
 
-        RuleMgr.rules.UnloadAll();
-        RuleMgr.rules.Load(File.ReadAllText($"{Program.dataPath}/rules.json"));
-         
-        string[] files = Directory.GetFiles($"{Program.dataPath}/rules", "*.json");
-        foreach(string path in files)
-            RuleMgr.rules.Load(File.ReadAllText(path));
-        
-        await RespondAsync($"Loaded the following rule files: [{string.Join(", ", files.Select(Path.GetFileName).Append("rules.json"))}]", ephemeral: true, flags: MessageFlags.SuppressNotification);
-    }
+        spamCooldowns[user.Id] = now;
 
-    [SlashCommand("togglefailurelog", "Admin command; toggles logging of each rule that failed into the console")]
-    public async Task ToggleFailureLog(string password, bool value)
-    {
-        if(Environment.GetEnvironmentVariable("ADMIN_PASSWORD") != password)
-        {
-            await RespondAsync("Invalid password.", ephemeral: true, flags: MessageFlags.SuppressNotification);
-            return;
-        }
+        message ??= $"@ @ @ $sender versucht dir (hier: $channel) etwas zu sagen @ @ @";
 
-        RuleMgr.logFailure = value;
-        await RespondAsync($"RuleMgr.logFailure is now set to {value}.", ephemeral: true, flags: MessageFlags.SuppressNotification);
+        message = message
+            .Replace("@", user.Mention)
+            .Replace("$sender", Context.User.Mention)
+            .Replace("$channel", $"<#{Context.Channel.Id}>");
+
+        await RespondAsync($"Spamming {user.Mention} with {messageCount} messages.", ephemeral: true, flags: MessageFlags.SuppressNotification);
+
+        for(i32 i = 0; i < messageCount; i++)
+            _ = user.SendMessageAsync(message);
+
+        await FollowupAsync("Finished!", ephemeral: ephemeral, flags: MessageFlags.SuppressNotification);
     }
 
     [SlashCommand("scheresteinpapier", "Lock in a bet for rock paper scissors and reveal all using the reveal button.")]
