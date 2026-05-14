@@ -170,4 +170,38 @@ public sealed class Interactions : InteractionModuleBase<SocketInteractionContex
             .AddCheckBox("Receive bot responses", new CheckboxBuilder().WithCustomId("optin_cb").WithDefaultState(true))
             .Build()
         );
+
+//    [SlashCommand("quote", "Create an embed from a quote.")]
+//    public async Task Quote(string )
+
+    [MessageCommand($"Vote (⬅➡)")]
+    public async Task VoteLR(IMessage message)
+        => await AddVoteReactionsAsync(message, ["arrow_left", "arrow_right"]);
+
+    [MessageCommand($"Vote (⬆⬇)")]
+    public async Task VoteUD(IMessage message)
+        => await AddVoteReactionsAsync(message, ["arrow_up", "arrow_down"]);
+
+    [MessageCommand($"Vote (⬆⬇⬅➡)")]
+    public async Task VoteUDLR(IMessage message)
+        => await AddVoteReactionsAsync(message, ["arrow_up", "arrow_down", "arrow_left", "arrow_right"]);
+
+
+    private async Task AddVoteReactionsAsync(IMessage message, string[] emoji)
+    {
+        await RespondAsync("Adding vote reactions", ephemeral: true, flags: MessageFlags.SuppressNotification);
+        await AddReactionsAsync(message, emoji);
+    }
+
+
+    private static async Task AddReactionsAsync(IMessage message, string[] emoji)
+    {
+        if(message is SocketUserMessage userMessage)
+            await userMessage.AddReactionsAsync(emoji.Select(e => new EmojiAlias(e).emote));
+        else
+        {
+            foreach(string e in emoji)
+                await message.AddReactionAsync(new EmojiAlias(e).emote);
+        }
+    }
 }

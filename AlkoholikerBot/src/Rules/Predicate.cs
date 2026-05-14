@@ -14,7 +14,7 @@ public readonly record struct Predicate()
     public string user { get; init; } = null;
     public i32 cooldownSeconds { get; init; } = -1;
     public bool? refMessage { get; init; } = null;
-    public bool? hasImage { get; init; } = null;
+    public bool? hasAttachment { get; init; } = null;
 
 
     public override string ToString()
@@ -29,7 +29,7 @@ public readonly record struct Predicate()
         if(!string.IsNullOrEmpty(channel)) sb.AppendLine($"{lnPrefix}channel: {channel}");
         sb.AppendLine($"{lnPrefix}cooldown: {GetActualCooldown(RuleMgr.rules)}s{(GetActualCooldown(RuleMgr.rules) == RuleMgr.rules.defaultCooldownSeconds ? " (default)" : "")}");
         if(refMessage is not null) sb.AppendLine($"{lnPrefix}is reply: {refMessage.Value}");
-        if(hasImage is not null) sb.AppendLine($"{lnPrefix}has image: {hasImage.Value}");
+        if(hasAttachment is not null) sb.AppendLine($"{lnPrefix}has image: {hasAttachment.Value}");
 
         return sb.ToString();
     }

@@ -1,1 +1,3 @@
-scp -r ./persistent/rules.json cinneyyy@192.168.5.88:/home/cinneyyy/Desktop/AlkoholikerBot/persistent/rules.json
+scp \
+    ./persistent/rules.json \
+    cinneyyy@192.168.5.82:/home/cinneyyy/Desktop/AlkoholikerBot/persistent/rules.json

@@ -21,7 +21,7 @@
             "predicate": {
                 "channel": "memes",
                 "cooldownSeconds": 0,
-                "hasImage": true,
+                "hasAttachment": true,
                 "user": "shalom"
             },
             "reply": {
@@ -33,8 +33,7 @@
 	    "name": "meme_channel_vote",
             "predicate": {
                 "channel": "memes",
-                "cooldownSeconds": 0,
-                "hasImage": true
+                "cooldownSeconds": 0
             },
             "reply": {
                 "reactions": [ "~arrow_up", "~arrow_down" ],
@@ -94,18 +93,19 @@
         {
 	    "name": "alkoholiker",
             "predicate": {
-                "regex": "(alk(?:ohol)?|[vw]odka|schnaps|pfeffi|berliner luft|whisk(?:e)?y|li(?:kö|queu)r|[a-z]*bier|[a-z]*wein)",
+                "regex": "(?:^|\\s)(ethanol|schnaps|pfeffi|bergquelle|berliner\\sluft|[a-z]*[\\s-]?cider|(?:riesling|weisherbst|wein)(?:[\\s-]schorle)?|[a-z]*schorle|al[kc](?:ohol)?|[vw]odka(?:[\\s-][a-z])?|whisk(?:e)?y|li(?:kö|queu)r|[a-z]*b(?:ie+|ö+)r|[a-z]*wein)(?:$|\\s)",
                 "regexIgnoreCase": true,
                 "cooldownSeconds": 5
             },
             "replies": [
                 { "text": "Hat jemand Alkohol gesagt?" },
-                { "text": "A-a.. Alkohool..." },
+                { "text": "A-a.. Alkohool...", "weight": 0.25 },
                 { "text": "Alkohol?" },
-                { "text": "Mmmmm, lekker Bööörchen!","weight": 0.5 },
+                { "text": "Mmmmm, lekker %1%!","weight": 0.5 },
                 { "text": "Wo ist %1%?", "refMessage": true, "weight": 1.25 },
+                { "text": "%1%? Gib her ich suche schon ewig mein %1%:~bangbang:", "refMessage": true, "weight": 1.0 },
                 { "attachment": "beer.jpg", "refMessage": true, "weight": 0.5 },
-                { "reactions": [ "~beer", "~beers", "~wine_glass", "~champagne", "~champagne_glass", "~:berlinerluft:1494149299100061889", "~:likoer43:1494149448467742721", "~:rothaus:1494149120754192415", "~:vodka:1494149467044057251", "~:parkbraeu:1494149518902558963", "~:vodka2:1494149491794907356" ], "weight": 1.5 }
+                { "reactions": [ "~beer", "~beers", "~wine_glass", "~champagne", "~champagne_glass", "~:berlinerluft:1494149299100061889", "~:likoer43:1494149448467742721", "~:rothaus:1494149120754192415", "~:vodka:1494149467044057251", "~:parkbraeu:1494149518902558963", "~:vodka2:1494149491794907356" ], "weight": 1.0 }
             ]
         },
         {
@@ -113,7 +113,7 @@
             "predicate": {
                 "user": "shalom",
                 "chance": 0.1,
-                "hasImage": false,
+                "hasAttachment": false,
                 "cooldownSeconds": 900
             },
             "replies": [
@@ -223,7 +223,7 @@
 	    "name": "darf_er_so_poll",
             "predicate": {
                 "chance": 0.0025,
-                "cooldownSeconds": 3600
+                "cooldownSeconds": 86400
             },
             "reply": {
                 "poll": {

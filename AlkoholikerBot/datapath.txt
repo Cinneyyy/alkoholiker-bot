@@ -1,1 +1,1 @@
-../../../../persistent
+/media/colin/(F) External Hard Drive/Projects/Git/alkoholiker-bot/AlkoholikerBot/persistent

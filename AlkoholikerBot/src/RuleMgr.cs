@@ -36,7 +36,7 @@ public static partial class RuleMgr
         if(OptOutMgr.IsOptedOut(msg.Author.Id))
             return error("User is not opted in.");
 
-        if(p.hasImage is not null && p.hasImage.Value != (msg.Attachments.Count > 0))
+        if(p.hasAttachment is not null && p.hasAttachment.Value != (msg.Attachments.Count > 0))
             return error("Attachment requirement did not match.");
 
         bool botIsPinged = msg.Content.Contains(botUserId.ToString());
@@ -127,8 +127,14 @@ public static partial class RuleMgr
                         text = reply.FormatText(rules, match);
                     }
 
-                    if(reply.attachments is not [] && reply.randomAttachment is string att && File.Exists($"{Program.dataPath}/res/{att}"))
+                    if(reply.attachments is not [] && reply.randomAttachmentPath is string att)
                     {
+                        if(!File.Exists(att))
+                        {
+                            Console.WriteLine($"File not found: {att}");
+                            return;
+                        }
+                        
                         await msg.Channel.SendFileAsync(
                             filePath: att,
                             text: text,
