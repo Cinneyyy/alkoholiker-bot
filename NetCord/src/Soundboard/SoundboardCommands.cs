@@ -4,7 +4,6 @@ using NetCord.Gateway;
 using NetCord.Gateway.Voice;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
-using src.TypeReaders;
 
 namespace src.Soundboard;
 
@@ -111,12 +110,62 @@ public class SoundboardCommands : ApplicationCommandModule<ApplicationCommandCon
     }
 
     [SubSlashCommand("add", "Add a sound to the soundboard.")]
-    public async Task Add(string name, [SlashCommandParameter(TypeReaderType = typeof(EmojiTypeReader<ApplicationCommandContext>))] EmojiProperties emoji)
+    public async Task Add(string name, Attachment file)
     {
         await RespondAsync(InteractionCallback.Message(new()
         {
-            Content = $"{name} {emoji.GetEmojiString()}",
-            Flags = MessageFlags.Get()
+            Content = $"Downloading {file.FileName}.",
+            Flags = MessageFlags.Get(ephemeral: false)
         }));
+
+        string tempFile = Path.GetTempFileName();
+        
+        using HttpClient http = new();
+        u8[] bytes = await http.GetByteArrayAsync(file.Url);
+        await File.WriteAllBytesAsync(tempFile, bytes);
+
+        await FollowupAsync(new()
+        {
+            Content = "Finished download; checking for file integrity.",
+            Flags = MessageFlags.Get(ephemeral: false)
+        });
+
+        using Process ffprobe = Process.Start(new ProcessStartInfo()
+        {
+            FileName = "ffprobe",
+            Arguments = $"""
+                -v error
+                -show_format
+                -show_streams
+                {tempFile}
+            """,
+            RedirectStandardError = true,
+            RedirectStandardOutput = true,
+            UseShellExecute = false
+        });
+
+        string ffprobeOut = await ffprobe.StandardError.ReadToEndAsync();
+        await ffprobe.WaitForExitAsync();
+
+        bool isValidFile = ffprobe.ExitCode == 0 && !ffprobeOut.Contains("Invalid", StringComparison.OrdinalIgnoreCase);
+
+        if(!isValidFile)
+        {
+            await FollowupAsync(new()
+            {
+                Content = "Failed to verify the integrity of your file.",
+                Flags = MessageFlags.Get(ephemeral: false)
+            });
+
+            return;
+        }
+
+        SoundboardDb.AddSound(tempFile, name, null);
+
+        await FollowupAsync(new()
+        {
+            Content = $"File sucessfully validated, and uploaded to soundboard as \"{name}\". To access it, run /soundboard open.",
+            Flags = MessageFlags.Get(ephemeral: false)
+        });
     }
 }

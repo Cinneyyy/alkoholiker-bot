@@ -11,7 +11,6 @@ using NetCord.Services.ApplicationCommands;
 using NetCord.Services.ComponentInteractions;
 using src;
 using src.Soundboard;
-using src.TypeReaders;
 
 Secrets.Load(
 #if DEBUG
