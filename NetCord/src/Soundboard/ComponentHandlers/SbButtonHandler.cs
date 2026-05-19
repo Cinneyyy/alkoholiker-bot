@@ -32,12 +32,7 @@ public sealed class SbButtonHandler : ComponentInteractionModule<ButtonInteracti
             return;
         }
 
-        await RespondAsync(InteractionCallback.Message(new()
-        {
-            Content = $"Playing sound \"{sound.displayName}\".",
-            Flags = MessageFlags.Ephemeral
-        }));
-
+        await Context.Interaction.SendResponseAsync(InteractionCallback.DeferredModifyMessage);
         await SoundboardPlayer.PlaySound(Context.Client, Context.Guild.Id, userVoiceState.ChannelId.Value, sound.filePath, sound.volume);
     }
 
@@ -126,7 +121,7 @@ public sealed class SbButtonHandler : ComponentInteractionModule<ButtonInteracti
 
         await RespondAsync(InteractionCallback.Message(new()
         {
-            Content = $"Removed sound \"{sound.displayName}\".",
+            Content = $"<@{Context.User.Id}> removed the sound \"{sound.displayName}\".",
             Flags = MessageFlags.Get(ephemeral: false)
         }));
     }

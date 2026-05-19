@@ -1,7 +1,6 @@
 using NetCord;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
-using NetCord.Services.Commands;
 
 namespace src.Soundboard;
 

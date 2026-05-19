@@ -66,7 +66,7 @@ public static class SoundboardPlayer
             }
             catch
             {
-                Console.WriteLine("Failed to flush opusStream");
+                Console.WriteLine("Failed to flush opusStream.");
             }
 
             Console.WriteLine(ffmpeg.StandardError.ReadToEnd());
