@@ -33,7 +33,7 @@ public static class SoundboardDb
         Json.SerializeFile(sound, sound.filePath + ".json");
 
         sounds.Add(sound);
-        Console.WriteLine($"Added new sound to soundboard: \"{displayName}\"");
+        Console.WriteLine($"Added new sound to soundboard: `{displayName}`");
     }
 
     public static void RemoveSound(string guid)
@@ -45,7 +45,7 @@ public static class SoundboardDb
         File.Delete(sound.filePath + ".json");
         sounds.Remove(sound);
 
-        Console.WriteLine($"Removed sound from soundboard: \"{sound.displayName}\".");
+        Console.WriteLine($"Removed sound from soundboard: `{sound.displayName}`.");
     }
 
     public static void EditSound(string guid, Func<Sound, Sound> edit)
@@ -59,7 +59,7 @@ public static class SoundboardDb
         sounds[sounds.FindIndex(s => s.guid == guid)] = sound;
         Json.SerializeFile(sound, sound.filePath + ".json");
 
-        Console.WriteLine($"Edited sound \"{originalName}\" ({guid}).");
+        Console.WriteLine($"Edited sound `{originalName}` ({guid}).");
     }
 
     public static bool TryGetSound(string guid, out Sound sound)

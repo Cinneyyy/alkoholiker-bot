@@ -6,26 +6,33 @@ namespace src.Soundboard;
 
 public static class SoundboardPlayer
 {
-    private static readonly Dictionary<(u64 guild, u64 channel), VoiceClient> voiceClients = [];
+    private static readonly Dictionary<u64, VoiceClient> voiceClients = [];
 
 
     public static async Task PlaySound(GatewayClient gatewayClient, u64 guildId, u64 channelId, string filePath, f32 volume)
     {
-        if(!voiceClients.TryGetValue((guildId, channelId), out VoiceClient voiceClient))
+        if(!voiceClients.TryGetValue(guildId, out VoiceClient voiceClient))
         {
             voiceClient = await gatewayClient.JoinVoiceChannelAsync(guildId, channelId);
             await voiceClient.StartAsync();
 
             Console.WriteLine($"Voice client opened ({guildId}:{channelId})");
-            voiceClients.Add((guildId, channelId), voiceClient);
+            voiceClients[guildId] = voiceClient;
 
             voiceClient.Disconnect += args =>
             {
                 Console.WriteLine($"Voice client closed ({guildId}:{channelId}).");
-                voiceClients.Remove((guildId, channelId));
+                voiceClients.Remove(guildId);
                 voiceClient.Dispose();
                 return default;
             };
+        }
+
+        if(voiceClient.ChannelId != channelId)
+        {
+            await voiceClient.CloseAsync();
+            await PlaySound(gatewayClient, guildId, channelId, filePath, volume);
+            return;
         }
 
         await voiceClient.EnterSpeakingStateAsync(new(SpeakingFlags.Soundshare));
@@ -63,6 +70,7 @@ public static class SoundboardPlayer
             try
             {
                 await opusStream.FlushAsync();    
+                Console.WriteLine("Flushed opusStream.");
             }
             catch
             {
@@ -71,5 +79,14 @@ public static class SoundboardPlayer
 
             Console.WriteLine(ffmpeg.StandardError.ReadToEnd());
         }
+    }
+
+    public static async Task<bool> Disconnect(u64 guildId)
+    {
+        if(!voiceClients.TryGetValue(guildId, out VoiceClient voiceClient))
+            return false;
+
+        await voiceClient.CloseAsync();
+        return true;
     }
 }

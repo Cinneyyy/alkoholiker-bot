@@ -29,11 +29,11 @@ public sealed class SoundboardCommands : ApplicationCommandModule<ApplicationCom
     }
 
     [SubSlashCommand("add", "Add a sound to the soundboard.")]
-    public async Task Add(string name, Attachment file, [SlashCommandParameter(MinValue = 0.0, MaxValue = 1.0)] f32 volume = 0.5f)
+    public async Task Add(string name, Attachment file, [SlashCommandParameter(MinValue = 0.0d, MaxValue = 1.0d)] f32 volume = 0.5f)
     {
         await RespondAsync(InteractionCallback.Message(new()
         {
-            Content = $"Downloading {file.FileName}.",
+            Content = $"Downloading `{file.FileName}`.",
             Flags = MessageFlags.Get(ephemeral: false)
         }));
 
@@ -47,7 +47,7 @@ public sealed class SoundboardCommands : ApplicationCommandModule<ApplicationCom
 
         await FollowupAsync(new()
         {
-            Content = $"File sucessfully downloaded and added to soundboard as \"{name}\". To access it, run /soundboard open.",
+            Content = $"File sucessfully downloaded and added to soundboard as `{name}`. To access it, run /soundboard open.",
             Flags = MessageFlags.Get(ephemeral: false)
         });
     }
@@ -94,6 +94,29 @@ public sealed class SoundboardCommands : ApplicationCommandModule<ApplicationCom
             Components = BuildSoundboardGrid("button_sound_edit"),
             Flags = MessageFlags.Get()
         }));
+    }
+
+    [SubSlashCommand("close", "Make the bot disconnect from the voice channel.")]
+    public async Task Close()
+    {
+        bool result = await SoundboardPlayer.Disconnect(Context.Guild.Id);
+    
+        if(result)
+        {
+            await RespondAsync(InteractionCallback.Message(new()
+            {
+                Content = "Successfully disconnected from voice channel.",
+                Flags = MessageFlags.Get(ephemeral: false)
+            }));
+        }
+        else
+        {
+            await RespondAsync(InteractionCallback.Message(new()
+            {
+                Content = "Failed to disconnect; bot is not in a voice channel.",
+                Flags = MessageFlags.Get()
+            }));
+        }
     }
 
 

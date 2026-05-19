@@ -48,8 +48,8 @@ public sealed class SbModalHandler : ComponentInteractionModule<ModalInteraction
             volume = newVolume
         });
 
-        StringBuilder messageBuilder = new($"<@{Context.User.Id}> made the following changes to the sound \"{sound.displayName}\":\n");
-        if(nameChanged) messageBuilder.AppendLine($"- name: \"{sound.displayName}\" -> \"{newName}\"");
+        StringBuilder messageBuilder = new($"<@{Context.User.Id}> made the following changes to the sound `{sound.displayName}`:\n");
+        if(nameChanged) messageBuilder.AppendLine($"- name: `{sound.displayName}` -> `{newName}`");
         if(volumeChanged) messageBuilder.AppendLine($"- volume: {sound.volume:0%} -> {newVolume:0%}");
 
         await RespondAsync(InteractionCallback.Message(new()

@@ -91,7 +91,7 @@ public sealed class SbButtonHandler : ComponentInteractionModule<ButtonInteracti
 
         await RespondAsync(InteractionCallback.Message(new()
         {
-            Content = $"Are you sure you want to remove the sound \"{sound.displayName}\"?",
+            Content = $"Are you sure you want to remove the sound `{sound.displayName}`?",
             Components = 
             [
                 new ActionRowProperties() 
@@ -121,7 +121,7 @@ public sealed class SbButtonHandler : ComponentInteractionModule<ButtonInteracti
 
         await RespondAsync(InteractionCallback.Message(new()
         {
-            Content = $"<@{Context.User.Id}> removed the sound \"{sound.displayName}\".",
+            Content = $"<@{Context.User.Id}> removed the sound `{sound.displayName}`.",
             Flags = MessageFlags.Get(ephemeral: false)
         }));
     }
