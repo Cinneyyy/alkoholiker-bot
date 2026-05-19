@@ -9,7 +9,7 @@ public static class SoundboardPlayer
     private static readonly Dictionary<(u64 guild, u64 channel), VoiceClient> voiceClients = [];
 
 
-    public static async Task PlaySound(GatewayClient gatewayClient, u64 guildId, u64 channelId, string filePath)
+    public static async Task PlaySound(GatewayClient gatewayClient, u64 guildId, u64 channelId, string filePath, f32 volume)
     {
         if(!voiceClients.TryGetValue((guildId, channelId), out VoiceClient voiceClient))
         {
@@ -42,6 +42,7 @@ public static class SoundboardPlayer
                 -i {filePath}
                 -vn
                 -map 0:a:0
+                -af "volume={volume}"
                 -ac 2
                 -ar 48000
                 -acodec pcm_s16le

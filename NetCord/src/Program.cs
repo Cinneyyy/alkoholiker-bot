@@ -39,7 +39,8 @@ hostBuilder.Services
             options.AutoRegisterCommands = false;
     })
     .AddGatewayHandlers(typeof(Program).Assembly)
-    .AddComponentInteractions<ButtonInteraction, ButtonInteractionContext>();
+    .AddComponentInteractions<ButtonInteraction, ButtonInteractionContext>()
+    .AddComponentInteractions<ModalInteraction, ModalInteractionContext>();
 
 IHost host = hostBuilder.Build();
 

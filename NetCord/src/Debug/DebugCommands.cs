@@ -14,7 +14,7 @@ public class DebugCommands : ApplicationCommandModule<ApplicationCommandContext>
         await RespondAsync(InteractionCallback.Message(new()
         {
             Content = "Pong!",
-            Flags = MessageFlags.Get(ephemeral)
+            Flags = MessageFlags.Get(ephemeral: ephemeral)
         }));
 
         string newMessage = $"Pong! ({(DateTime.UtcNow - start).TotalMilliseconds:0}ms)";
