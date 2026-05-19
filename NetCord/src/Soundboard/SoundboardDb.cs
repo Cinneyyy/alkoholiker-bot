@@ -19,9 +19,9 @@ public static class SoundboardDb
     }
 
     /// <summary>Add a file to the DB and save it to disk.</summary>
-    public static void AddSound(string tempAudioPath, string displayName, string displayEmoji)
+    public static void AddSound(string tempAudioPath, string displayName)
     {
-        Sound sound = new(Guid.NewGuid().ToString(), displayName, displayEmoji);
+        Sound sound = new(Guid.NewGuid().ToString(), displayName);
 
         if(!File.Exists(tempAudioPath))
         {
@@ -29,8 +29,11 @@ public static class SoundboardDb
             return;
         }
 
-        File.Move(tempAudioPath, App.GetPath(sound.guid));
-        Json.SerializeFile(sound, App.GetPath($"{sound.guid}.json"));
+        File.Move(tempAudioPath, sound.filePath);
+        Json.SerializeFile(sound, $"{sound.filePath}.json");
+
+        sounds.Add(sound);
+        Console.WriteLine($"Added new sound to soundboard: {displayName}");
     }
 
     public static Sound GetSound(string guid)

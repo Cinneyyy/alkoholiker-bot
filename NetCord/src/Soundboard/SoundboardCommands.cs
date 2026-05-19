@@ -40,12 +40,12 @@ public class SoundboardCommands : ApplicationCommandModule<ApplicationCommandCon
         }));
 
         await voiceClient.StartAsync();
-        await voiceClient.EnterSpeakingStateAsync(new SpeakingProperties(SpeakingFlags.Microphone));
+        await voiceClient.EnterSpeakingStateAsync(new SpeakingProperties(SpeakingFlags.Soundshare));
     
-        Stream voiceStream = voiceClient.CreateVoiceStream();
-        OpusEncodeStream opusStream = new(voiceStream, PcmFormat.Short, VoiceChannels.Stereo, OpusApplication.Audio);
+        using Stream voiceStream = voiceClient.CreateVoiceStream();
+        using OpusEncodeStream opusStream = new(voiceStream, PcmFormat.Short, VoiceChannels.Stereo, OpusApplication.Audio);
 
-        Process ffmpeg = Process.Start(new ProcessStartInfo()
+        using Process ffmpeg = Process.Start(new ProcessStartInfo()
         {
             FileName = "ffmpeg",
             Arguments = $"""
@@ -100,11 +100,12 @@ public class SoundboardCommands : ApplicationCommandModule<ApplicationCommandCon
 
         await RespondAsync(InteractionCallback.Message(new()
         {
-            Content = "Soundboard:",
-            Components =
-            [
-                new ActionRowProperties(SoundboardDb.GetSounds().Select(s => new ButtonProperties($"play_sound:{s.guid}", s.displayName, s.displayEmojiProperties, ButtonStyle.Primary)))
-            ],
+            Components = SoundboardDb
+                .GetSounds()
+                .Chunk(5)
+                .Select(sounds => new ActionRowProperties(sounds
+                    .Select(sound => new ButtonProperties($"play_sound:{sound.guid}", sound.displayName, ButtonStyle.Primary)))
+                ),
             Flags = MessageFlags.Get(ephemeral)
         }));
     }
@@ -124,47 +125,11 @@ public class SoundboardCommands : ApplicationCommandModule<ApplicationCommandCon
         u8[] bytes = await http.GetByteArrayAsync(file.Url);
         await File.WriteAllBytesAsync(tempFile, bytes);
 
-        await FollowupAsync(new()
-        {
-            Content = "Finished download; checking for file integrity.",
-            Flags = MessageFlags.Get(ephemeral: false)
-        });
-
-        using Process ffprobe = Process.Start(new ProcessStartInfo()
-        {
-            FileName = "ffprobe",
-            Arguments = $"""
-                -v error
-                -show_format
-                -show_streams
-                {tempFile}
-            """,
-            RedirectStandardError = true,
-            RedirectStandardOutput = true,
-            UseShellExecute = false
-        });
-
-        string ffprobeOut = await ffprobe.StandardError.ReadToEndAsync();
-        await ffprobe.WaitForExitAsync();
-
-        bool isValidFile = ffprobe.ExitCode == 0 && !ffprobeOut.Contains("Invalid", StringComparison.OrdinalIgnoreCase);
-
-        if(!isValidFile)
-        {
-            await FollowupAsync(new()
-            {
-                Content = "Failed to verify the integrity of your file.",
-                Flags = MessageFlags.Get(ephemeral: false)
-            });
-
-            return;
-        }
-
-        SoundboardDb.AddSound(tempFile, name, null);
+        SoundboardDb.AddSound(tempFile, name);
 
         await FollowupAsync(new()
         {
-            Content = $"File sucessfully validated, and uploaded to soundboard as \"{name}\". To access it, run /soundboard open.",
+            Content = $"File sucessfully downloaded and added to soundboard as \"{name}\". To access it, run /soundboard open.",
             Flags = MessageFlags.Get(ephemeral: false)
         });
     }
