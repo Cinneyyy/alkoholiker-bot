@@ -1,0 +1,18 @@
+meme_channel_vote{
+    IF{
+        channel{memes} &
+        cooldown{0s}
+    }
+    THEN{
+        react{~arrow_up; ~arrow_down}
+
+        IF{
+            user{shalom}
+        }
+        THEN{
+            react{~neutral_face}
+        }
+
+        break{}
+    }
+}
