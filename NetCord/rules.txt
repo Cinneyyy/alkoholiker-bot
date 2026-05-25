@@ -1,13 +1,13 @@
 rule(meme_channel_vote; {
     if([
-        channel(memes) &
+        channel(#memes) &
         cooldown(0s)
     ])
     then({
         react(:arrow_up, :arrow_down)
 
         if(
-            user(shalom)
+            user(@shalom)
         )
         then(
             react(:neutral_face)

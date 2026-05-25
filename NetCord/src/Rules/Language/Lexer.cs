@@ -99,5 +99,5 @@ public sealed class Lexer(string code)
         => char.IsDigit(chr) || "+-.".Contains(chr);
 
     private static bool IsWordChar(char chr)
-        => char.IsLetterOrDigit(chr) || chr == '_';
+        => char.IsLetterOrDigit(chr) || chr is '_' or '~';
 }

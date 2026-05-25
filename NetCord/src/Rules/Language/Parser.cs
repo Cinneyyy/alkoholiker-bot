@@ -106,7 +106,7 @@ public sealed class Parser(Token[] tokens)
                 i = endOfNode;
             }
 
-            return new CodeBlockNode(ValueType.CodeBlock, nodes.Where(n => n is not InvalidNode).ToArray());
+            return new CodeBlockNode(nodes.Where(n => n is not InvalidNode).ToArray());
         }
         else if(Get(first).type == Token.Type.OpenSquare)
         {

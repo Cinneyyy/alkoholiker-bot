@@ -2,7 +2,7 @@ namespace src.Rules.Language;
 
 public enum ValueType : u8
 {
-    CodeBlock,
+    Void,
     Int,
     Float,
     Str,
