@@ -9,5 +9,6 @@ public enum ValueType : u8
     Bool,
     Emoji,
     User,
-    Channel
+    Channel,
+    CodeBlock
 }

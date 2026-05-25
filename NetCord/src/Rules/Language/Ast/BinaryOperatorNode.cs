@@ -8,11 +8,11 @@ public sealed record class BinaryOperatorNode
         Value lv = lhs.Eval();
         Value rv = rhs.Eval();
 
-        switch(oper)
+        return oper switch
         {
-            case "&": return new(ValueType.Bool, (bool)lv.value & (bool)rv.value);
-            case "|": return new(ValueType.Bool, (bool)lv.value | (bool)rv.value);
-            default: throw new($"Invalid operation ({oper}).");
-        }
+            "&" => new(ValueType.Bool, (bool)lv.value & (bool)rv.value),
+            "|" => new(ValueType.Bool, (bool)lv.value | (bool)rv.value),
+            _ => throw new($"Invalid operation ({oper})."),
+        };
     }
 }

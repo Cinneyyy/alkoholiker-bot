@@ -9,6 +9,11 @@ public static class Runtime
     public static Dictionary<string, Emoji> emojiAliases = [];
     public static List<Function> functions =
     [
+        new("rule", args =>
+        {
+            string name = args[0].value as string;
+
+        })
     ];
 
 
