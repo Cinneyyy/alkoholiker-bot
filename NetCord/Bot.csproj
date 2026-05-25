@@ -16,6 +16,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Compile Remove="rules/*" />
+    </ItemGroup>
+
+    <ItemGroup>
         <None Update="secrets.release.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>        
@@ -24,7 +28,10 @@
         </None>       
         <None Update="config.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>        
+        </None>
+        <None Update="rules/*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
 
     </ItemGroup>
 </Project>
