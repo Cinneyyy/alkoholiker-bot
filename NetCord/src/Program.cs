@@ -10,7 +10,12 @@ using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
 using NetCord.Services.ComponentInteractions;
 using src;
+using src.Rules.Language;
+using src.Rules.Language.Ast;
 using src.Soundboard;
+
+Token[] tokens = new Lexer(File.ReadAllText("rules.txt")).Analyze();
+AstNode ast = new Parser(tokens).Parse();
 
 Secrets.Load(
 #if DEBUG

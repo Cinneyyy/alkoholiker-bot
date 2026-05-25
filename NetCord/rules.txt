@@ -1,18 +1,18 @@
-meme_channel_vote{
-    IF{
-        channel{memes} &
-        cooldown{0s}
-    }
-    THEN{
-        react{~arrow_up; ~arrow_down}
+rule(meme_channel_vote; {
+    if([
+        channel(memes) &
+        cooldown(0s)
+    ])
+    then({
+        react(:arrow_up, :arrow_down)
 
-        IF{
-            user{shalom}
-        }
-        THEN{
-            react{~neutral_face}
-        }
+        if(
+            user(shalom)
+        )
+        then(
+            react(:neutral_face)
+        )
 
-        break{}
-    }
-}
+        break()
+    })
+})
