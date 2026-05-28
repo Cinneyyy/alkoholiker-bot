@@ -5,6 +5,9 @@ public static class SoundboardDb
     private static readonly List<Sound> sounds = [];
 
 
+    public static string path { get; private set; }
+
+
     public static IReadOnlyList<Sound> GetSounds()
         => sounds.AsReadOnly();
 
@@ -12,11 +15,15 @@ public static class SoundboardDb
     {
         sounds.Clear();
 
-        Directory.CreateDirectory(App.GetPath("soundboard"));
+        path = path;
+        Directory.CreateDirectory(path);
 
-        foreach(string file in Directory.GetFiles(App.GetPath("soundboard"), "*.json", SearchOption.AllDirectories))
+        foreach(string file in Directory.GetFiles(path, "*.json", SearchOption.AllDirectories))
             sounds.Add(Json.DeserializeFile<Sound>(file));
     }
+
+    public static void SetPath(string path)
+        => SoundboardDb.path = path;
 
     /// <summary>Add a file to the DB and save it to disk.</summary>
     public static void AddSound(string tempAudioPath, string displayName, f32 volume = 0.5f)

@@ -2,10 +2,10 @@ using NetCord;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
 
-namespace src.Debug;
+namespace src.Commands;
 
-[SlashCommand("debug", "Debug commands.")]
-public class DebugCommands : ApplicationCommandModule<ApplicationCommandContext>
+[SlashCommand("debug", "debug")]
+public sealed class DebugCommands : ApplicationCommandModule<ApplicationCommandContext>
 {
     [SubSlashCommand("ping", "Ping the bot and display the time it took for the bot to send a message and receive the ACK.")]
     public async Task Ping(bool ephemeral = true)
@@ -19,5 +19,16 @@ public class DebugCommands : ApplicationCommandModule<ApplicationCommandContext>
 
         string newMessage = $"Pong! ({(DateTime.UtcNow - start).TotalMilliseconds:0}ms)";
         await Context.Interaction.ModifyResponseAsync(m => m.Content = newMessage);
+    }
+
+    [SubSlashCommand("uptime", "Check for how long the bot has been online.")]
+    public async Task Uptime(bool ephemeral = true)
+    {
+        TimeSpan time = DateTime.UtcNow - App.startTime;
+        await RespondAsync(InteractionCallback.Message(new()
+        {
+            Content = $"The bot has been running for {time.Add(TimeSpan.FromDays(20)).Days}d {time.Hours}h {time.Minutes}m {time.Seconds}s.",
+            Flags = MessageFlags.Get(ephemeral: ephemeral)
+        }));
     }
 }

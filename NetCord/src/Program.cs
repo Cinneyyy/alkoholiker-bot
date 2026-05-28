@@ -10,12 +10,9 @@ using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
 using NetCord.Services.ComponentInteractions;
 using src;
-using src.Rules.Language;
-using src.Rules.Language.Ast;
+using src.Rules;
+using src.Rules.Opt;
 using src.Soundboard;
-
-Token[] tokens = new Lexer(File.ReadAllText("rules.txt")).Analyze();
-AstNode ast = new Parser(tokens).Parse();
 
 Secrets.Load(
 #if DEBUG
@@ -24,11 +21,20 @@ Secrets.Load(
     "secrets.release.json"
 #endif
 );
-Config.Load("config.json");
+
 App.Load();
+Console.WriteLine($"Data path: {App.dataPath}");
+
+Config.SetPath(App.GetPath("config.json"));
+Config.Load();
+
+RuleMgr.SetPath(App.GetPath("rules"));
+RuleMgr.Load();
+
+SoundboardDb.SetPath(App.GetPath("soundboard"));
 SoundboardDb.Load();
 
-Console.WriteLine($"Data path: {App.dataPath}");
+OptMgr.SetPath(App.GetPath("opted_out"));
 
 HostApplicationBuilder hostBuilder = Host.CreateApplicationBuilder(args);
 
@@ -48,14 +54,14 @@ hostBuilder.Services
     .AddComponentInteractions<ModalInteraction, ModalInteractionContext>();
 
 IHost host = hostBuilder.Build();
+RestClient client = host.Services.GetRequiredService<RestClient>();
+App.SetClient(client);
 
 host.AddModules(typeof(Program).Assembly);
 
 if(Secrets.guild != 0ul)
 {
-    IServiceProvider services = host.Services;
-    ApplicationCommandService<ApplicationCommandContext> service = services.GetRequiredService<ApplicationCommandService<ApplicationCommandContext>>();
-    RestClient client = services.GetRequiredService<RestClient>();
+    ApplicationCommandService<ApplicationCommandContext> service = host.Services.GetRequiredService<ApplicationCommandService<ApplicationCommandContext>>();
     ApplicationCommandProperties[] properties = await Task.WhenAll(service.GetCommands().Where(c => c.Name is not ("some" or "filter" or "if" or "needed")).Select(c => c.GetRawValueAsync().AsTask()));
     u64 guildId = Secrets.guild;
     await client.BulkOverwriteGuildApplicationCommandsAsync(((IEntityToken)client.Token!).Id, guildId, properties);

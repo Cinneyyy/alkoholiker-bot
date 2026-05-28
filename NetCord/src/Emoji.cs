@@ -1,27 +1,52 @@
 using NetCord;
+using NetCord.Rest;
 
 namespace src;
 
-public class Emoji
+public readonly record struct Emoji
 {
-    public string builtIn = null;
-    public u64 custom = 0ul;
+    public readonly string name = null;
+    public readonly u64 id = 0ul;
 
 
     public Emoji(string builtIn)
-        => this.builtIn = builtIn.Trim().Trim(':');
+        => name = builtIn.Trim().Trim(':');
 
-    public Emoji(u64 custom)
-        => this.custom = custom;
+    public Emoji(string customName, u64 customId)
+    {
+        name = customName;
+        id = customId;
+    }
 
 
     public override string ToString()
-        => string.IsNullOrWhiteSpace(builtIn)
-            ? $"<:custom:{custom}>"
-            : $":{builtIn}:";
+        => string.IsNullOrWhiteSpace(name)
+            ? $"<:custom:{id}>"
+            : $":{name}:";
 
     public EmojiProperties ToEmojiProperties()
-        => string.IsNullOrWhiteSpace(builtIn)
-            ? EmojiProperties.Custom(custom)
-            : EmojiProperties.Standard(builtIn);
+        => id != 0ul
+            ? EmojiProperties.Custom(id)
+            : EmojiProperties.Standard(name);
+
+    public ReactionEmojiProperties ToReactionProperties()
+        => id != 0ul
+            ? new(name, id)
+            : new(name);
+
+
+    public static Emoji Parse(string emoji)
+    {
+        if(emoji.Contains(':'))
+#if DEBUG
+        {
+            Console.WriteLine($"Substituting emoji {emoji} with {Config.customEmojiFallback}");
+            return new("🇭");
+        }
+#elif RELEASE
+            return new(emoji.Split(':')[0], u64.Parse(emoji.Split(':')[1]));
+#endif
+        else
+            return new(emoji);
+    }
 }

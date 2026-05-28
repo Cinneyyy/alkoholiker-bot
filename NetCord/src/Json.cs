@@ -12,7 +12,9 @@ public static class Json
         NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.AllowNamedFloatingPointLiterals,
         ReadCommentHandling = JsonCommentHandling.Skip,
         WriteIndented = true,
-        PropertyNameCaseInsensitive = true
+        IndentSize = 4,
+        PropertyNameCaseInsensitive = true,
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow
     };
 
 
