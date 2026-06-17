@@ -51,19 +51,13 @@ public readonly partial struct Reply()
 
             if(attachments is not null and not [])
             {
-                Console.WriteLine(string.Join(", ", attachments));
-
-                response = response.WithAttachments(
-                    attachments
-                    .Select(
-                        att => new AttachmentProperties(Path.GetFileName(att), File.OpenRead(att))
-                    )
-                );
+                string att = attachments.SelectRandom();
+                response = response.WithAttachments([new(Path.GetFileName(att), File.OpenRead(att))]);
             }
 
             if(poll is Poll p)
             {
-                response = response.WithPoll(new(
+                response = response.WithPoll(new MessagePollProperties(
                     new()
                     {
                         Text = p.question.text,
@@ -73,8 +67,10 @@ public readonly partial struct Reply()
                     {
                         Text = a.text,
                         Emoji = a.emoji is null ? null : Emoji.Parse(a.emoji).ToEmojiProperties()
-                    }))
-                ));
+                    })))
+                        .WithDurationInHours((i32)p.hours)
+                        .WithAllowMultiselect(p.multiselect)
+                );
             }
 
             await message.Channel.SendMessageAsync(response);
@@ -87,7 +83,7 @@ public readonly partial struct Reply()
         }
     }
 
-    [GeneratedRegex(@"$(\w+)$")]
+    [GeneratedRegex(@"\$([A-Z-a-z0-9_]+)\$")]
     private static partial SysRegex SnippetRegex();
 
     [GeneratedRegex(@"@(\d+)@")]

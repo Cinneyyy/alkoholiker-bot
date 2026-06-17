@@ -7,10 +7,14 @@ public readonly record struct Rule()
     public required Reply[] replies { get; init; }
     public required bool @break { get; init; }
     public i32 order { get; init; } = 0;
+    public bool useRandomReply { get; init; } = true;
     public Reply randomReply
     {
         get
         {
+            if(replies.Length == 0)
+                return default;
+
             if(replies.Length == 1)
                 return replies.First();
 
@@ -28,5 +32,5 @@ public readonly record struct Rule()
 
             return replies[^1];
         }
-    } 
+    }
 }

@@ -6,8 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Interactions;
+using Discord.LibDave.Binding;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using src.Rules;
 
 namespace src;
 
@@ -34,7 +36,9 @@ public class Program
         client = new DiscordSocketClient(new DiscordSocketConfig()
         {
             GatewayIntents = GatewayIntents.All ^ GatewayIntents.GuildPresences ^ GatewayIntents.GuildScheduledEvents ^ GatewayIntents.GuildInvites,
-            MessageCacheSize = 128
+            MessageCacheSize = 128,
+            UseInteractionSnowflakeDate = false,
+            EnableVoiceDaveEncryption = true
         });
 
         services = new ServiceCollection()

@@ -1,7 +1,7 @@
 ﻿using System;
 using Discord;
 
-namespace src.Rules;
+namespace src;
 
 public readonly record struct EmojiAlias()
 {

@@ -28,7 +28,7 @@ public static class RuleMgr
             }
             catch(Exception e)
             {
-                Console.WriteLine($"Failed to load rule file ({file}): {e.Message}.");
+                Log.Out($"Failed to load rule file ({file}): {e.Message}.");
             }
         }
 
@@ -50,7 +50,14 @@ public static class RuleMgr
             {
                 if(rule.predicate.CheckTruth(rule, message))
                 {
-                    await rule.randomReply.Apply(message, rule);
+                    if(rule.useRandomReply)
+                        await rule.randomReply.Apply(message, rule);
+                    else
+                    {
+                        foreach(Reply reply in rule.replies)
+                            await reply.Apply(message, rule);
+                    }
+
                     numRulesApplied++;
 
                     if(rule.@break)
@@ -59,7 +66,7 @@ public static class RuleMgr
             }
             catch(Exception e)
             {
-                Console.WriteLine($"Exception occurred when checking/applying rule: {e}");
+                Log.Out($"Exception occurred when checking/applying rule: {e}");
             }
         }
 

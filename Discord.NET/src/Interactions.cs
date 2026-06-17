@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -8,9 +9,11 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Audio;
 using Discord.Interactions;
 using Discord.WebSocket;
 using src.Rules;
+using src.Soundboard;
 
 namespace src;
 
@@ -171,8 +174,95 @@ public sealed class Interactions : InteractionModuleBase<SocketInteractionContex
             .Build()
         );
 
-//    [SlashCommand("quote", "Create an embed from a quote.")]
-//    public async Task Quote(string )
+    [SlashCommand("playsound", "Debug command.")]
+    public async Task PlaySound(IVoiceChannel channel = null)
+    {
+        channel ??= (Context.User as IGuildUser)?.VoiceChannel;
+
+        if(channel is null)
+        {
+            await RespondAsync("Channel cannot be null.", ephemeral: true, flags: MessageFlags.SuppressNotification);
+            return;
+        }
+
+        await RespondAsync($"Joining channel {channel.Name}.", ephemeral: true, flags: MessageFlags.SuppressNotification);
+
+        await SoundboardMgr.JoinVoiceChannelAsync(channel);
+        await Task.Delay(200);
+        SoundboardMgr.LoadSounds();
+        await SoundboardMgr.PlaySound(SoundboardMgr.sounds.First(), channel.Id);
+    }
+
+    [SlashCommand("playclip", "asdf")]
+    public async Task PlayClipAsync()
+    {
+        // Get the user who invoked the command
+        var user = Context.User as SocketGuildUser;
+        if (user?.VoiceChannel == null)
+        {
+            await RespondAsync("You must be in a voice channel for me to join!", ephemeral: true);
+            return;
+        }
+
+        // Join the user's voice channel
+        var audioClient = await user.VoiceChannel.ConnectAsync();
+
+        // Path to your clip
+        string clipPath = "/home/colin/Downloads/niekbeats.mp3";
+
+        if (!File.Exists(clipPath))
+        {
+            await RespondAsync($"Clip not found at {clipPath}", ephemeral: true);
+            return;
+        }
+
+        await RespondAsync($"Joining {user.VoiceChannel.Name} and playing clip!", ephemeral: true);
+
+        // Play the MP3
+        await PlayAudioAsync(audioClient, clipPath);
+        
+        // Disconnect after playback
+        await audioClient.StopAsync();
+    }
+private async Task PlayAudioAsync(IAudioClient client, string path)
+{
+    var ffmpeg = Process.Start(new ProcessStartInfo
+    {
+        FileName = "ffmpeg",
+        Arguments =
+            $"-hide_banner -loglevel error " +
+            $"-i \"{path}\" " +
+            "-vn -map 0:a:0 " +
+            "-ac 2 -ar 48000 -acodec pcm_s16le -f s16le pipe:1",
+        RedirectStandardOutput = true,
+        RedirectStandardError = true,
+        UseShellExecute = false
+    });
+
+
+    await using var output = ffmpeg.StandardOutput.BaseStream;
+    await using var discord = client.CreatePCMStream(AudioApplication.Mixed, bitrate: 128 * 1024);
+
+    try
+    {
+        await output.CopyToAsync(discord);
+    }
+    finally
+    {
+        await discord.FlushAsync();
+    }
+}
+    private Process CreateStream(string path)
+    {
+        return Process.Start(new ProcessStartInfo
+        {
+            FileName = "ffmpeg",
+            Arguments = $"-hide_banner -loglevel panic -i \"{path}\" -ac 2 -f s16le -ar 48000 pipe:1",
+            RedirectStandardOutput = true,
+            UseShellExecute = false
+        });
+    }
+
 
     [MessageCommand($"Vote (⬅➡)")]
     public async Task VoteLR(IMessage message)
@@ -189,7 +279,7 @@ public sealed class Interactions : InteractionModuleBase<SocketInteractionContex
 
     private async Task AddVoteReactionsAsync(IMessage message, string[] emoji)
     {
-        await RespondAsync("Adding vote reactions", ephemeral: true, flags: MessageFlags.SuppressNotification);
+        await RespondAsync("Adding vote reactions.", ephemeral: true, flags: MessageFlags.SuppressNotification);
         await AddReactionsAsync(message, emoji);
     }
 

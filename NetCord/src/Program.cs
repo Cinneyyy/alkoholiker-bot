@@ -5,11 +5,13 @@ using NetCord.Gateway;
 using NetCord.Hosting.Gateway;
 using NetCord.Hosting.Services;
 using NetCord.Hosting.Services.ApplicationCommands;
+using NetCord.Hosting.Services.Commands;
 using NetCord.Hosting.Services.ComponentInteractions;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
 using NetCord.Services.ComponentInteractions;
 using src;
+using src.Interactions;
 using src.Rules;
 using src.Rules.Opt;
 using src.Soundboard;
@@ -23,7 +25,7 @@ Secrets.Load(
 );
 
 App.Load();
-Console.WriteLine($"Data path: {App.dataPath}");
+Log.Out($"Starting bot; data path: {App.dataPath}");
 
 Config.SetPath(App.GetPath("config.json"));
 Config.Load();
@@ -44,7 +46,7 @@ hostBuilder.Services
         options.Token = Secrets.token;
         options.Intents = GatewayIntents.All;
     })
-    .AddApplicationCommands(options =>
+     .AddApplicationCommands(options =>
     {
         if(Secrets.guild != 0ul)
             options.AutoRegisterCommands = false;
@@ -53,9 +55,11 @@ hostBuilder.Services
     .AddComponentInteractions<ButtonInteraction, ButtonInteractionContext>()
     .AddComponentInteractions<ModalInteraction, ModalInteractionContext>();
 
+
 IHost host = hostBuilder.Build();
-RestClient client = host.Services.GetRequiredService<RestClient>();
-App.SetClient(client);
+RestClient restClient = host.Services.GetRequiredService<RestClient>();
+GatewayClient gatewayClient = host.Services.GetRequiredService<GatewayClient>();
+App.SetClient(restClient, gatewayClient);
 
 host.AddModules(typeof(Program).Assembly);
 
@@ -64,7 +68,7 @@ if(Secrets.guild != 0ul)
     ApplicationCommandService<ApplicationCommandContext> service = host.Services.GetRequiredService<ApplicationCommandService<ApplicationCommandContext>>();
     ApplicationCommandProperties[] properties = await Task.WhenAll(service.GetCommands().Where(c => c.Name is not ("some" or "filter" or "if" or "needed")).Select(c => c.GetRawValueAsync().AsTask()));
     u64 guildId = Secrets.guild;
-    await client.BulkOverwriteGuildApplicationCommandsAsync(((IEntityToken)client.Token!).Id, guildId, properties);
+    await restClient.BulkOverwriteGuildApplicationCommandsAsync(((IEntityToken)restClient.Token).Id, guildId, properties);
 }
 
 await host.RunAsync();

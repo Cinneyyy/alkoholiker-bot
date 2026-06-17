@@ -38,7 +38,7 @@ public sealed class SoundboardCommands : ApplicationCommandModule<ApplicationCom
         }));
 
         string tempFile = Path.GetTempFileName();
-        
+
         using HttpClient http = new();
         u8[] bytes = await http.GetByteArrayAsync(file.Url);
         await File.WriteAllBytesAsync(tempFile, bytes);
@@ -65,7 +65,7 @@ public sealed class SoundboardCommands : ApplicationCommandModule<ApplicationCom
 
             return;
         }
-        
+
         await RespondAsync(InteractionCallback.Message(new()
         {
             Content = "Select a sound to remove.",
@@ -100,7 +100,7 @@ public sealed class SoundboardCommands : ApplicationCommandModule<ApplicationCom
     public async Task Close()
     {
         bool result = await SoundboardPlayer.Disconnect(Context.Guild.Id);
-    
+
         if(result)
         {
             await RespondAsync(InteractionCallback.Message(new()

@@ -23,7 +23,7 @@ public readonly partial record struct Predicate()
     public u32? cooldownMinutes { init => cooldownSeconds = 60 * value; }
     public u32? cooldownHours { init => cooldownSeconds = 60*60 * value; }
     public string cooldown { init => cooldownSeconds = TimeStrToSeconds(value); }
-    [JsonIgnore] public u32 actualCooldownSeconds => cooldownSeconds ?? Config.defRuleCooldown;
+    [JsonIgnore] public u32 actualCooldownSeconds => cooldownSeconds ?? Config.defaultRuleCooldownSeconds;
 
 
     public bool CheckTruth(Rule rule, Message message)
@@ -31,7 +31,7 @@ public readonly partial record struct Predicate()
         bool failure(string ctx)
         {
             if(Config.logRuleFailure)
-                Console.WriteLine($"[{rule.name}] {ctx}");
+                Log.Out($"[{rule.name}] {ctx}");
 
             return false;
         }
@@ -46,7 +46,7 @@ public readonly partial record struct Predicate()
             return failure("Attachment requirement did not match.");
 
         // chance
-        if(!botIsPinged && chance != 1f && chance < Random.Shared.Next())
+        if(!botIsPinged && chance is f32 reqChance && reqChance < Random.Shared.NextSingle())
             return failure("Chance requirement failed.");
 
         // channel

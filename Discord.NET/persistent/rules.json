@@ -21,7 +21,6 @@
             "predicate": {
                 "channel": "memes",
                 "cooldownSeconds": 0,
-                "hasAttachment": true,
                 "user": "shalom"
             },
             "reply": {
@@ -44,7 +43,7 @@
 	    "name": "lukas_weed",
             "predicate": {
                 "user": "lukas",
-                "cooldownSeconds": 0
+                "cooldownSeconds": 25
             },
             "reply": {
                 "reactions": [ "~:weed:1491627418144866434" ]
@@ -61,6 +60,21 @@
                 "reactions": [ "~rainbow_flag" ]
             },
             "break": false
+        },        
+        {
+	    "name": "rock_and_stone",
+            "predicate": {
+                "cooldownSeconds": 0,
+                "regex": "rock\\s+and\\s+stone",
+                "regexIgnoreCase": true
+            },
+            "reply": {
+                "text": "$reply$",
+                "snippets": {
+                    "reply": ["Rock and stone!", "Rock and stone, to the bone!", "Stone!", "I am a dwarf and I'm digging a hole!"]
+                }
+            },
+            "break": true
         },
         {
             "name": "colin_reply",
@@ -93,7 +107,7 @@
         {
 	    "name": "alkoholiker",
             "predicate": {
-                "regex": "(?:^|\\s)(ethanol|schnaps|pfeffi|bergquelle|berliner\\sluft|[a-z]*[\\s-]?cider|(?:riesling|weisherbst|wein)(?:[\\s-]schorle)?|[a-z]*schorle|al[kc](?:ohol)?|[vw]odka(?:[\\s-][a-z])?|whisk(?:e)?y|li(?:kö|queu)r|[a-z]*b(?:ie+|ö+)r|[a-z]*wein)(?:$|\\s)",
+                "regex": "(?:^|\\s)(ethanol|schnaps|pfeffi|bergquelle|berliner\\sluft|[a-z]*[\\s-]?cider|(?:riesling|weisherbst|wein)(?:[\\s-]schorle)?|[a-z]*schorle|al[kc](?:ohol)?|[vw]odka(?:[\\s-][a-z])?|whisk(?:e)?y|li(?:kö|queu)r|[a-z]*b(?:ie+|ö+)r(?:chen)?|[a-z]*wein)(?:$|\\s)",
                 "regexIgnoreCase": true,
                 "cooldownSeconds": 5
             },
@@ -105,6 +119,7 @@
                 { "text": "Wo ist %1%?", "refMessage": true, "weight": 1.25 },
                 { "text": "%1%? Gib her ich suche schon ewig mein %1%:~bangbang:", "refMessage": true, "weight": 1.0 },
                 { "attachment": "beer.jpg", "refMessage": true, "weight": 0.5 },
+                { "text": "Nimm die Finger davon du Alkoholwal. Das %1% ist nicht zum Trinken da:~bangbang: (zumindest nicht für dich)", "refMessage": true, "weight": 1.0 },
                 { "reactions": [ "~beer", "~beers", "~wine_glass", "~champagne", "~champagne_glass", "~:berlinerluft:1494149299100061889", "~:likoer43:1494149448467742721", "~:rothaus:1494149120754192415", "~:vodka:1494149467044057251", "~:parkbraeu:1494149518902558963", "~:vodka2:1494149491794907356" ], "weight": 1.0 }
             ]
         },

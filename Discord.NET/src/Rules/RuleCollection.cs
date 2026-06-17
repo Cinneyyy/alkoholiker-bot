@@ -29,7 +29,7 @@ public sealed class RuleCollection
         if(alias.StartsWith('~'))
             return new() { alias = "", id = u64.Parse(alias[1..]) };
         else
-            return channels.FindAll(c => c.alias == alias).First();
+            return channels.FindAll(c => c.alias == alias).FirstOrDefault();
     }
 
     public UserAlias GetUser(string alias)
@@ -37,7 +37,7 @@ public sealed class RuleCollection
         if(alias.StartsWith('~'))
             return new() { alias = "", id = u64.Parse(alias[1..]) };
         else
-            return users.FindAll(u => u.alias == alias).First();
+            return users.FindAll(u => u.alias == alias).FirstOrDefault();
     }
 
     public IEmote GetEmoji(string alias)

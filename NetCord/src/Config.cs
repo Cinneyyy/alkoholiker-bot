@@ -5,35 +5,58 @@ namespace src;
 
 public readonly struct Config
 {
+    public enum Field
+    {
+        defaultRuleCooldown,
+        logRuleFailure,
+        customEmojiFallback,
+        callHistoryChannel,
+        logSolitaryCalls,
+        activityChangeIntervalMs
+    }
+
+
     private static string path;
 
 
-    [JsonInclude, JsonPropertyName("defRuleCooldown")] private readonly string _defRuleCooldown
+    [JsonInclude, JsonPropertyName("defaultRuleCooldown")] private readonly string _defaultRuleCooldown
     {
-        get => $"{defRuleCooldown}s";
-        set => defRuleCooldown = Predicate.TimeStrToSeconds(value); 
+        get => $"{defaultRuleCooldownSeconds}s";
+        set => defaultRuleCooldownSeconds = Predicate.TimeStrToSeconds(value); 
     }
-    [JsonInclude, JsonPropertyName("logRuleFailure")] private readonly bool _logRuleFailure
+    [JsonInclude, JsonPropertyName(nameof(logRuleFailure))] private readonly bool _logRuleFailure
     {
         get => logRuleFailure;
         set => logRuleFailure = value;
     }
-    [JsonInclude, JsonPropertyName("customEmojiFallback")] private readonly string _customEmojiFallback
+    [JsonInclude, JsonPropertyName(nameof(customEmojiFallback))] private readonly string _customEmojiFallback
     {
         get => customEmojiFallback;
         set => customEmojiFallback = value;
     }
-    [JsonInclude, JsonPropertyName("callHistoryChannel")] private readonly u64 _callHistoryChannel
+    [JsonInclude, JsonPropertyName(nameof(callHistoryChannel))] private readonly u64 _callHistoryChannel
     {
         get => callHistoryChannel;
         set => callHistoryChannel = value;
     }
+    [JsonInclude, JsonPropertyName(nameof(logSolitaryCalls))] private readonly bool _logSolitaryCalls
+    {
+        get => logSolitaryCalls;
+        set => logSolitaryCalls = value;
+    }
+    [JsonInclude, JsonPropertyName(nameof(activityChangeIntervalMs))] private readonly i32 _activityChangeIntervalMs
+    {
+        get => activityChangeIntervalMs;
+        set => activityChangeIntervalMs = value;
+    }
 
 
-    public static u32 defRuleCooldown { get; private set; } = 0u;
+    public static u32 defaultRuleCooldownSeconds { get; private set; } = 0u;
     public static bool logRuleFailure { get; private set; } = false;
     public static string customEmojiFallback { get; private set; } = "🇭";
     public static u64 callHistoryChannel { get; private set; } = 0ul;
+    public static bool logSolitaryCalls { get; private set; } = false;
+    public static i32 activityChangeIntervalMs { get; private set; } = 60000;
 
 
 
