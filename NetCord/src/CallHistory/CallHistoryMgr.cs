@@ -21,7 +21,7 @@ public static class CallHistoryMgr
             File.WriteAllText(GetPath($"channels/{channel}/session_start"), now); // Write time to channels/#/session_start
         }
 
-        File.Create(GetPath($"channels/{channel}/active/{user}")); // Create channels/#/active/@
+        File.WriteAllText(GetPath($"channels/{channel}/active/{user}"), string.Empty); // Create channels/#/active/@
         File.AppendAllLines(GetPath($"channels/{channel}/history/{user}"), [now]); // Append time to channels/#/history/@
         File.WriteAllText(GetPath($"users/{user}"), channel.ToString()); // Write channel to users/@
     }
