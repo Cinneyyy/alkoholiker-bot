@@ -93,7 +93,7 @@ public static class CallHistoryMgr
                             new()
                             {
                                 Name = "**Presence**",
-                                Value = $"```\n{string.Join("\n", participants.Select(p => $"{p.partSeconds/time.TotalSeconds:0%}\t{p.partSeconds/60f/60f:0.0h}"))}```",
+                                Value = $"```\n{string.Join("\n", participants.Select(p => $"{(p.partSeconds/time.TotalSeconds).ToString("0%").PadLeft(4)}  {(p.partSeconds/60f/60f).ToString("0.0h").PadLeft(5)}"))}```",
                                 Inline = true
                             }
                         ],
