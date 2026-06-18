@@ -17,9 +17,18 @@ public sealed class VoiceStateUpdateGatewayHandler : IVoiceStateUpdateGatewayHan
             Directory.CreateDirectory(CallHistoryMgr.GetPath("channels"));
 
             if(arg.ChannelId is u64 channelId) // User joined a voice channel.
-            {
-                if(File.Exists(CallHistoryMgr.GetPath($"users/{arg.UserId}"))) // User switched over from another channel, if so, handle disconnect.
+            {// User switched over from another channel, if so, handle disconnect.
+
+                if(File.Exists(CallHistoryMgr.GetPath($"users/{arg.UserId}")))
+                {
+                    u64 prevChannel = u64.Parse(File.ReadAllText(CallHistoryMgr.GetPath($"users/{arg.UserId}")).Trim());
+
+                    if(prevChannel == channelId) // User muted or deafened themself
+                        return;
+
+                    // Else: user switched voice channel, so disconnect them before reconnecting
                     await CallHistoryMgr.HandleDisconnect(arg.GuildId, arg.UserId);
+                }
 
                 CallHistoryMgr.HandleConnect(channelId, arg.UserId);
             }

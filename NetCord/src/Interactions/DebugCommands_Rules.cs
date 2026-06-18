@@ -25,8 +25,8 @@ public sealed partial class DebugCommands
             }));
         }
 
-        [SubSlashCommand("show", "Display the active bot rules.")]
-        public async Task Show(bool ephemeral = true)
+        [SubSlashCommand("print", "Print the active bot rules.")]
+        public async Task Print(bool ephemeral = true)
         {
             string rules = string.Join(",\n", RuleMgr
                 .GetRuleFiles()

@@ -6,7 +6,7 @@ public static class MessageLogMgr
 {
     public static void MessageCreated(Message message)
     {
-        string path = App.GetPath($"msg_log/{message.GuildId}/{message.ChannelId}/");
+        string path = App.GetPath($"msg_log/{message.GuildId ?? 0}/{message.ChannelId}/");
         Directory.CreateDirectory(path);
         File.WriteAllText($"{path}/{message}", message.toLoggableStr);
     }
@@ -15,7 +15,7 @@ public static class MessageLogMgr
     {
         string path = App.GetPath($"msg_log/{guild}/{channel}/{message}");
         Log.Out(File.Exists(path)
-            ? $"Cached message deleted in {guild}:{channel}: {File.ReadAllText(path)}."
+            ? $"Cached message deleted in {guild}:{channel} ({message}): {File.ReadAllText(path)}."
             : $"Uncached message deleted in {guild}:{channel} ({message}).");
     }
 }

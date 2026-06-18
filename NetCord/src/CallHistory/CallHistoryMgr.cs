@@ -31,26 +31,31 @@ public static class CallHistoryMgr
         Log.Out($"User {user} ({App.restClient.GetUserAsync(user).GetAwaiter().GetResult().Username}) left voice channel in guild {guildId}");
         i64 now = DateTime.UtcNow.Ticks;
 
-        u64 channel = u64.Parse(File.ReadAllText(GetPath($"users/{user}"))); // Read channel from users/@
+        u64 channel = u64.Parse(File.ReadAllText(GetPath($"users/{user}")).Trim()); // Read channel from users/@
         File.Delete(GetPath($"users/{user}")); // Delete users/@
         File.Delete(GetPath($"channels/{channel}/active/{user}")); // Delete channels/#/active/@
         File.AppendAllLines(GetPath($"channels/{channel}/history/{user}"), [now.ToString()]); // Write time to channels/#/history/@
 
         if(Directory.GetFiles(GetPath($"channels/{channel}/active")).Length == 0) // User is the last one to leave the call.
         {
-            (u64 id, f64 partSeconds)[] participants = Directory
+            (u64 id, u32 partSeconds)[] participants = Directory
                 .GetFiles(GetPath($"channels/{channel}/history")) // Get files in channels/#/history
                 .Select(f => (
                     id: u64.Parse(Path.GetFileName(f)),
-                    partSeconds: File.ReadAllLines(f)
+                    partSeconds: (u32)(File.ReadAllLines(f)
+                        .Where(ln => !string.IsNullOrWhiteSpace(ln))
+                        .Select(ln => ln.Trim())
                         .Select(i64.Parse)
                         .Chunk(2)
-                        .Sum(ticks => ticks[1] - ticks[0]) / (f64)TimeSpan.TicksPerSecond
+                        .Where(chunk => chunk.Length == 2)
+                        .Sum(ticks => ticks[1] - ticks[0]) / TimeSpan.TicksPerSecond)
                     ))
                 .OrderByDescending(p => p.partSeconds)
                 .ToArray();
 
-            i64 sessionStart = i64.Parse(File.ReadAllText(GetPath($"channels/{channel}/session_start"))); // Read time from channels/#/session_start
+            CallStatistics.OnVoiceCallEnd(participants);
+
+            i64 sessionStart = i64.Parse(File.ReadAllText(GetPath($"channels/{channel}/session_start")).Trim()); // Read time from channels/#/session_start
             Directory.Delete(GetPath($"channels/{channel}"), true); // Delete channels/#/
 
             if(participants.Length <= 1 && !Config.logSolitaryCalls)
@@ -65,6 +70,10 @@ public static class CallHistoryMgr
             IReadOnlyList<IGuildChannel> guildChannels = await guild.GetChannelsAsync();
             TextGuildChannel textChannel = guildChannels.First(c => c.Id == Config.callHistoryChannel) as TextGuildChannel;
 
+            string[] names = new string[participants.Length];
+            for(i32 i = 0; i < names.Length; i++)
+                names[i] = (await App.restClient.GetUserAsync(participants[i].id)).GlobalName;
+
             await textChannel.SendMessageAsync(new()
             {
                 Embeds =
@@ -76,14 +85,15 @@ public static class CallHistoryMgr
                         [
                             new()
                             {
-                                Name = "**Participants**",
-                                Value = string.Join("\n", participants.Select(p => $"<@{p.id}>")),
+                                Name = "**Participant**",
+                                //Value = string.Join("\n", participants.Select(p => $"<@{p.id}>")),
+                                Value = $"```\n{string.Join("\n", names)}```",
                                 Inline = true
                             },
                             new()
                             {
                                 Name = "**Presence**",
-                                Value = string.Join("\n", participants.Select(p => (p.partSeconds/time.TotalSeconds).ToString("0%"))),
+                                Value = $"```\n{string.Join("\n", participants.Select(p => $"{p.partSeconds/time.TotalSeconds:0%}\t{p.partSeconds/60f/60f:0.0h}"))}```",
                                 Inline = true
                             }
                         ],

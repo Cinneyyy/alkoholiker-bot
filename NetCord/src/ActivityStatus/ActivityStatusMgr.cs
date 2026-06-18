@@ -2,7 +2,7 @@ using NetCord;
 using NetCord.Gateway;
 using NetCord.Hosting.Gateway;
 
-namespace src;
+namespace src.ActivityStatus;
 
 public sealed class ActivityStatusMgr : IReadyGatewayHandler
 {
@@ -10,6 +10,7 @@ public sealed class ActivityStatusMgr : IReadyGatewayHandler
     {
         IsBackground = true
     };
+    private static Activities activities = new();
 
 
     public async ValueTask HandleAsync(ReadyEventArgs args)
@@ -19,21 +20,15 @@ public sealed class ActivityStatusMgr : IReadyGatewayHandler
     }
 
 
+    public static void Load()
+    {
+        activities = Json.DeserializeFile<Activities>(App.GetPath($"statuses.json"));
+        activities.GenerateProperties();
+    }
+
     private static async void StatusUpdateThread()
     {
-#pragma warning disable CA1861 // Avoid constant arrays as arguments
-        UserActivityProperties[] activities =
-        [
-            ..new string[]
-            {
-                "Thinking about alcohol",
-                "Vodka-O"
-            }.Select(s => new UserActivityProperties(s, UserActivityType.Custom) { State = s }),
-            new("Competing in a Drinking Contest", UserActivityType.Competing),
-            new("Listening to Alcohol's Wisdom", UserActivityType.Listening),
-            new("Playing Alcohol Speedrung Any%", UserActivityType.Playing),
-            new("Watching Alcohol Ferment", UserActivityType.Watching),
-        ];
+        Load();
 
         while(true)
         {
@@ -41,7 +36,7 @@ public sealed class ActivityStatusMgr : IReadyGatewayHandler
             {
                 Afk = false,
                 Since = new(new DateTime(2001, 9, 11)),
-                Activities = [activities.SelectRandom()]
+                Activities = [activities.properties.SelectRandom()]
             });
 
             Thread.Sleep(Config.activityChangeIntervalMs);

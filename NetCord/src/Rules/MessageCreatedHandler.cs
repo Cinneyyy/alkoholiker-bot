@@ -11,7 +11,7 @@ public sealed class MessageCreatedHandler : IMessageCreateGatewayHandler
             return default;
 
         u32 numRulesApplied = RuleMgr.ApplyRules(message).GetAwaiter().GetResult();
-        Log.Out($"{message.toLoggableStr} [applied {numRulesApplied} rule{(numRulesApplied == 1 ? "" : "s")}].");
+        Log.Out($"[In {message.GuildId ?? 0}:{message.ChannelId}; ID: {message.Id}]: {message.toLoggableStr} [applied {numRulesApplied} rule{(numRulesApplied == 1 ? "" : "s")}].");
 
         return ValueTask.CompletedTask;
     }

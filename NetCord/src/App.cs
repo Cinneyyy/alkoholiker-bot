@@ -1,3 +1,4 @@
+using System.Text;
 using NetCord;
 using NetCord.Gateway;
 using NetCord.Rest;
@@ -27,7 +28,7 @@ public static class App
 
     public static async Task<bool> CheckForOwner(ApplicationCommandContext ctx)
     {
-        if(ctx.User.Id != Secrets.owner)
+        if (ctx.User.Id != Secrets.owner)
         {
             await ctx.Interaction.SendResponseAsync(InteractionCallback.Message(new()
             {
@@ -45,5 +46,19 @@ public static class App
     public static string GetTimeStr(DateTime time)
         => time.ToString("yyyy'-'MM'-'dd' 'HH':'mm':'ss");
     public static string GetTimeStr(TimeSpan span)
-        => span.ToString("dd'd 'HH'h 'mm'm 'ss's'");
+    {
+        StringBuilder sb = new();
+        sb.Insert(0, $"{span.Seconds:00}s");
+
+        if(span.TotalMinutes >= 1d)
+            sb.Insert(0, $"{span.Minutes:00}m ");
+
+        if(span.TotalHours >= 1d)
+            sb.Insert(0, $"{span.Hours:00}h ");
+
+        if(span.TotalDays >= 1d)
+            sb.Insert(0, $"{span.Days}d ");
+
+        return sb.ToString();
+    }
 }
