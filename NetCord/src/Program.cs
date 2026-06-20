@@ -26,7 +26,13 @@ Secrets.Load(
 App.Load();
 Log.Out($"Starting bot; data path: {App.dataPath}");
 
-Config.SetPath(App.GetPath("config.json"));
+Config.SetPath(App.GetPath(
+#if DEBUG
+    "config.debug.json"
+#elif RELEASE
+    "config.release.json"
+#endif
+));
 Config.Load();
 
 RuleMgr.SetPath(App.GetPath("rules"));

@@ -36,72 +36,75 @@ public static class CallHistoryMgr
         File.Delete(GetPath($"channels/{channel}/active/{user}")); // Delete channels/#/active/@
         File.AppendAllLines(GetPath($"channels/{channel}/history/{user}"), [now.ToString()]); // Write time to channels/#/history/@
 
-        if(Directory.GetFiles(GetPath($"channels/{channel}/active")).Length == 0) // User is the last one to leave the call.
+        if(Directory.GetFiles(GetPath($"channels/{channel}/active")).Length != 0) // User is the last one to leave the call.
+            return;
+
+        (u64 id, f32 partSeconds)[] participants = Directory
+            .GetFiles(GetPath($"channels/{channel}/history")) // Get files in channels/#/history
+            .Select(f => (
+                id: u64.Parse(Path.GetFileName(f)),
+                partSeconds: (f32)(File.ReadAllLines(f)
+                    .Where(ln => !string.IsNullOrWhiteSpace(ln))
+                    .Select(ln => ln.Trim())
+                    .Select(i64.Parse)
+                    .Chunk(2)
+                    .Where(chunk => chunk.Length == 2)
+                    .Sum(ticks => ticks[1] - ticks[0]) / TimeSpan.TicksPerSecond)
+                ))
+            .OrderByDescending(p => p.partSeconds)
+            .ToArray();
+
+        CallStatistics.OnVoiceCallEnd(participants.Select(p => (p.id, (u32)p.partSeconds)));
+
+        i64 sessionStart = i64.Parse(File.ReadAllText(GetPath($"channels/{channel}/session_start")).Trim()); // Read time from channels/#/session_start
+        Directory.Delete(GetPath($"channels/{channel}"), true); // Delete channels/#/
+
+        if(participants.Length <= 1 && !Config.logSolitaryCalls)
         {
-            (u64 id, u32 partSeconds)[] participants = Directory
-                .GetFiles(GetPath($"channels/{channel}/history")) // Get files in channels/#/history
-                .Select(f => (
-                    id: u64.Parse(Path.GetFileName(f)),
-                    partSeconds: (u32)(File.ReadAllLines(f)
-                        .Where(ln => !string.IsNullOrWhiteSpace(ln))
-                        .Select(ln => ln.Trim())
-                        .Select(i64.Parse)
-                        .Chunk(2)
-                        .Where(chunk => chunk.Length == 2)
-                        .Sum(ticks => ticks[1] - ticks[0]) / TimeSpan.TicksPerSecond)
-                    ))
-                .OrderByDescending(p => p.partSeconds)
-                .ToArray();
-
-            CallStatistics.OnVoiceCallEnd(participants);
-
-            i64 sessionStart = i64.Parse(File.ReadAllText(GetPath($"channels/{channel}/session_start")).Trim()); // Read time from channels/#/session_start
-            Directory.Delete(GetPath($"channels/{channel}"), true); // Delete channels/#/
-
-            if(participants.Length <= 1 && !Config.logSolitaryCalls)
-            {
-                Log.Out($"Call ended ({guildId}:{channel}, with user {user}), but skipping log, since they were the only participant. To change this behaviour, enable Config.logSolitaryCalls.");
-                return;
-            }
-
-            TimeSpan time = TimeSpan.FromTicks(DateTime.UtcNow.Ticks - sessionStart);
-
-            RestGuild guild = await App.restClient.GetGuildAsync(guildId);
-            IReadOnlyList<IGuildChannel> guildChannels = await guild.GetChannelsAsync();
-            TextGuildChannel textChannel = guildChannels.First(c => c.Id == Config.callHistoryChannel) as TextGuildChannel;
-
-            string[] names = new string[participants.Length];
-            for(i32 i = 0; i < names.Length; i++)
-                names[i] = (await App.restClient.GetUserAsync(participants[i].id)).GlobalName;
-
-            await textChannel.SendMessageAsync(new()
-            {
-                Embeds =
-                [
-                    new()
-                    {
-                        Title = $"Call ended in <#{channel}> that lasted {time.Days*24 + time.Hours}h {time.Minutes}m {time.Seconds}s",
-                        Fields =
-                        [
-                            new()
-                            {
-                                Name = "**Participant**",
-                                //Value = string.Join("\n", participants.Select(p => $"<@{p.id}>")),
-                                Value = $"```\n{string.Join("\n", names)}```",
-                                Inline = true
-                            },
-                            new()
-                            {
-                                Name = "**Presence**",
-                                Value = $"```\n{string.Join("\n", participants.Select(p => $"{(p.partSeconds/time.TotalSeconds).ToString("0%").PadLeft(4)}  {(p.partSeconds/60f/60f).ToString("0.0h").PadLeft(5)}"))}```",
-                                Inline = true
-                            }
-                        ],
-                        Color = new((i32)Random.Shared.NextRgb())
-                    }
-                ],
-                Flags = MessageFlags.Get(ephemeral: false)
-            });
+            Log.Out($"Call ended ({guildId}:{channel}, with user {user}), but skipping log, since they were the only participant. To change this behaviour, enable Config.logSolitaryCalls.");
+            return;
         }
+        else
+            Log.Out($"Call ended in {guildId}:{channel}, with user {user}.");
+
+        TimeSpan time = TimeSpan.FromTicks(DateTime.UtcNow.Ticks - sessionStart);
+
+        RestGuild guild = await App.restClient.GetGuildAsync(guildId);
+        IReadOnlyList<IGuildChannel> guildChannels = await guild.GetChannelsAsync();
+        TextGuildChannel textChannel = guildChannels.First(c => c.Id == Config.callHistoryChannel) as TextGuildChannel;
+
+        IEnumerable<(u64 id, string name, string hours, string percent)> partFmtData = participants
+            .Select(p => (
+                id: p.id,
+                name: UserCache.GetName(p.id).GetAwaiter().GetResult(),
+                hours: (p.partSeconds / 3600f).ToString("0.0h"),
+                percent: (p.partSeconds / time.TotalSeconds).ToString("0%")
+            ));
+
+        (i32 hourPad, i32 percentPad) = (partFmtData.First().hours.Length, partFmtData.First().percent.Length);
+
+        await textChannel.SendMessageAsync(new()
+        {
+            Embeds =
+            [
+                new()
+                {
+                    Title = $"Call ended in <#{channel}>",
+                    Description =
+                        "```ansi\n" +
+                        string.Join("\n", partFmtData 
+                            .Select(p => $"[ {p.percent.PadLeft(percentPad)} | {p.hours.PadLeft(hourPad)} ]  {App.GetAnsiColor(UserCache.GetRoleColor(guildId, p.id).GetAwaiter().GetResult())}{p.name}")
+                        ) +
+                        "```",
+                    Color = new((i32)Random.Shared.NextRgb()),
+                    Footer = new()
+                    {
+                        Text = App.GetTimeStr(time)
+                    },
+                    Timestamp = new(DateTime.Now.Add(time))
+                }
+            ],
+            Flags = MessageFlags.Get(ephemeral: false)
+        });
     }
 }

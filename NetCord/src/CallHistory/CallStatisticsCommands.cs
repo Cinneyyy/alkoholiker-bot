@@ -5,7 +5,7 @@ using NetCord.Services.ApplicationCommands;
 namespace src.CallHistory;
 
 [SlashCommand("call-stats", "call-stats")]
-public sealed class CallStatsCommands : ApplicationCommandModule<ApplicationCommandContext>
+public sealed class CallStatisticsCommands : ApplicationCommandModule<ApplicationCommandContext>
 {
     [SubSlashCommand("get", "Get your or someone else's call statistics.")]
     public async Task Get(User user = null, bool ephemeral = true)
@@ -26,50 +26,47 @@ public sealed class CallStatsCommands : ApplicationCommandModule<ApplicationComm
     public async Task GetAll(bool ephemeral = true)
     {
         (u64 id, u32 seconds)[] stats = CallStatistics.GetAllCallSeconds();
-        Array.Sort(stats, (a, b) => (i32)((i64)b.seconds - a.seconds));
 
         if(stats is [])
         {
             await RespondAsync(InteractionCallback.Message(new()
             {
-                Content = $"No user has spent any time in voice calls.",
+                Content = $"No user has spent any time in voice channels.",
                 Flags = MessageFlags.Get(ephemeral: ephemeral)
             }));
 
             return;
         }
 
-        string[] names = new string[stats.Length];
-        for(i32 i = 0; i < names.Length; i++)
-            names[i] = (await App.restClient.GetUserAsync(stats[i].id)).GlobalName;
+        // In case uncached names need to be fetched from the Discord API
+        await RespondAsync(InteractionCallback.DeferredMessage(MessageFlags.Get(ephemeral: ephemeral)));
 
-        await RespondAsync(InteractionCallback.Message(new()
+        IEnumerable<(string name, string timeStr)> fmtStats = stats
+            .OrderByDescending(stat => stat.seconds)
+            .Select(stat => (
+                name: UserCache.GetName(stat.id).GetAwaiter().GetResult(),
+                timeStr: App.GetTimeStr(TimeSpan.FromSeconds(stat.seconds))
+            ));
+
+        i32 timePad = fmtStats.First().timeStr.Length;
+
+        await FollowupAsync(new()
         {
             Embeds =
             [
                 new()
                 {
                     Title = "Call statistics",
-                    Fields =
-                    [
-                        new()
-                        {
-                            Name = "**User**",
-                            //Value = string.Join("\n", stats.Select(stat => $"<@{stat.id}>")),
-                            Value = $"```\n{string.Join("\n", names)}```",
-                            Inline = true
-                        },
-                        new()
-                        {
-                            Name = "**Time**",
-                            Value = $"```\n{string.Join("\n", stats.Select(stat => App.GetTimeStr(TimeSpan.FromSeconds(stat.seconds))))}```",
-                            Inline = true
-                        }
-                    ],
-                    Color = new((i32)Random.Shared.NextRgb())
-                },
+                    Color = new((i32)Random.Shared.NextRgb()),
+                    Description =
+                        "```\n" +
+                        string.Join("\n", fmtStats
+                            .Select(stat => $"[ {stat.timeStr.PadLeft(timePad)} ]  {stat.name}")
+                        ) +
+                        "```"
+                }
             ],
             Flags = MessageFlags.Get(ephemeral: ephemeral)
-        }));
+        });
     }
 }

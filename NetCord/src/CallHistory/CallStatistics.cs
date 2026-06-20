@@ -2,7 +2,7 @@ namespace src.CallHistory;
 
 public static class CallStatistics
 {
-    public static void OnVoiceCallEnd((u64 id, u32 seconds)[] participantData)
+    public static void OnVoiceCallEnd(IEnumerable<(u64 id, u32 seconds)> participantData)
     {
         Directory.CreateDirectory(App.GetPath("call_stats/"));
 

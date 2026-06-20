@@ -8,6 +8,9 @@ namespace src;
 
 public static class App
 {
+    public const string AnsiReset = "\x1b[0m";
+
+
     public static string dataPath { get; private set; }
     public static RestClient restClient { get; private set; }
     public static GatewayClient gatewayClient { get; private set; }
@@ -28,7 +31,7 @@ public static class App
 
     public static async Task<bool> CheckForOwner(ApplicationCommandContext ctx)
     {
-        if (ctx.User.Id != Secrets.owner)
+        if(ctx.User.Id != Secrets.owner)
         {
             await ctx.Interaction.SendResponseAsync(InteractionCallback.Message(new()
             {
@@ -48,17 +51,31 @@ public static class App
     public static string GetTimeStr(TimeSpan span)
     {
         StringBuilder sb = new();
-        sb.Insert(0, $"{span.Seconds:00}s");
 
-        if(span.TotalMinutes >= 1d)
-            sb.Insert(0, $"{span.Minutes:00}m ");
+        void prepend(i32 value, char unit, bool padWithZeros)
+            => sb.Insert(0, padWithZeros ? $"{value:00}{unit} " : $"{value,2}{unit} ");
 
-        if(span.TotalHours >= 1d)
-            sb.Insert(0, $"{span.Hours:00}h ");
+        bool hasMins = span.TotalMinutes > 1d;
+        bool hasHours = span.TotalHours > 1d;
+        bool hasDays = span.TotalDays > 1d;
 
-        if(span.TotalDays >= 1d)
-            sb.Insert(0, $"{span.Days}d ");
+        prepend(span.Seconds, 's', hasMins);
+        sb.Remove(sb.Length-1, 1); // Remove trailing space
+
+        if(hasMins)
+            prepend(span.Minutes, 'm', hasHours);
+
+        if(hasHours)
+            prepend(span.Hours, 'h', hasDays);
+
+        if(hasDays)
+            prepend(span.Days, 'd', false);
 
         return sb.ToString();
     }
+
+    public static string GetAnsiColor(u8 r, u8 g, u8 b)
+        => $"\x1b[38;2;{r};{g};{b}m";
+    public static string GetAnsiColor(u32 rgb)
+        => GetAnsiColor((u8)(rgb >> 16), (u8)(rgb >> 8), (u8)rgb);
 }
