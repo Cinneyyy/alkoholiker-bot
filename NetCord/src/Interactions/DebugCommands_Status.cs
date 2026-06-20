@@ -10,7 +10,7 @@ public sealed partial class DebugCommands
     [SubSlashCommand("status", "status")]
     public sealed class Status : ApplicationCommandModule<ApplicationCommandContext>
     {
-        [SubSlashCommand("reload", "Reload statuses.")]
+        [SubSlashCommand("reload", "[!] Reload statuses.")]
         public async Task Reload(bool ephemeral = true)
         {
             if(!await App.CheckForOwner(Context))
@@ -27,8 +27,7 @@ public sealed partial class DebugCommands
 
         [SubSlashCommand("print", "Print the possible statuses.")]
         public async Task Print(bool ephemeral = true)
-        {
-            await RespondAsync(InteractionCallback.Message(new()
+            => await RespondAsync(InteractionCallback.Message(new()
             {
                 Attachments =
                 [
@@ -36,6 +35,5 @@ public sealed partial class DebugCommands
                 ],
                 Flags = MessageFlags.Get(ephemeral: ephemeral)
             }));
-        }
     }
 }

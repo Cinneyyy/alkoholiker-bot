@@ -8,9 +8,6 @@ namespace src;
 
 public static class App
 {
-    public const string AnsiReset = "\x1b[0m";
-
-
     public static string dataPath { get; private set; }
     public static RestClient restClient { get; private set; }
     public static GatewayClient gatewayClient { get; private set; }
@@ -35,7 +32,7 @@ public static class App
         {
             await ctx.Interaction.SendResponseAsync(InteractionCallback.Message(new()
             {
-                Content = "Failed to execute command.",
+                Content = "You do not have the permission to execute this command.",
                 Flags = MessageFlags.Get()
             }));
 
@@ -73,9 +70,4 @@ public static class App
 
         return sb.ToString();
     }
-
-    public static string GetAnsiColor(u8 r, u8 g, u8 b)
-        => $"\x1b[38;2;{r};{g};{b}m";
-    public static string GetAnsiColor(u32 rgb)
-        => GetAnsiColor((u8)(rgb >> 16), (u8)(rgb >> 8), (u8)rgb);
 }

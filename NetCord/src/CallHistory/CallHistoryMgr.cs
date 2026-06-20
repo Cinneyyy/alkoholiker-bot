@@ -73,10 +73,9 @@ public static class CallHistoryMgr
         IReadOnlyList<IGuildChannel> guildChannels = await guild.GetChannelsAsync();
         TextGuildChannel textChannel = guildChannels.First(c => c.Id == Config.callHistoryChannel) as TextGuildChannel;
 
-        IEnumerable<(u64 id, string name, string hours, string percent)> partFmtData = participants
+        IEnumerable<(string name, string hours, string percent)> partFmtData = participants
             .Select(p => (
-                id: p.id,
-                name: UserCache.GetName(p.id).GetAwaiter().GetResult(),
+                name: UserCache.GetName(p.id),
                 hours: (p.partSeconds / 3600f).ToString("0.0h"),
                 percent: (p.partSeconds / time.TotalSeconds).ToString("0%")
             ));
@@ -91,9 +90,9 @@ public static class CallHistoryMgr
                 {
                     Title = $"Call ended in <#{channel}>",
                     Description =
-                        "```ansi\n" +
+                        "```\n" +
                         string.Join("\n", partFmtData 
-                            .Select(p => $"[ {p.percent.PadLeft(percentPad)} | {p.hours.PadLeft(hourPad)} ]  {App.GetAnsiColor(UserCache.GetRoleColor(guildId, p.id).GetAwaiter().GetResult())}{p.name}")
+                            .Select(p => $"[ {p.percent.PadLeft(percentPad)} | {p.hours.PadLeft(hourPad)} ]  {p.name}")
                         ) +
                         "```",
                     Color = new((i32)Random.Shared.NextRgb()),

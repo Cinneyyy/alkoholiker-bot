@@ -22,7 +22,7 @@ public sealed class OptCommands : ApplicationCommandModule<ApplicationCommandCon
         }
 
         OptMgr.OptOut(Context.User.Id);
-        
+
         await RespondAsync(InteractionCallback.Message(new()
         {
             Content = "Successfully opted out.",
@@ -45,7 +45,7 @@ public sealed class OptCommands : ApplicationCommandModule<ApplicationCommandCon
         }
 
         OptMgr.OptIn(Context.User.Id);
-        
+
         await RespondAsync(InteractionCallback.Message(new()
         {
             Content = "Successfully opted in.",

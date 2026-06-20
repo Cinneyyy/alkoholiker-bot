@@ -12,37 +12,45 @@ public sealed partial class DebugCommands
         [SubSlashCommand("print", "Print the contents of the vc_state directory.")]
         public async Task Print(bool ephemeral = true)
         {
-            if(!await App.CheckForOwner(Context))
-                return;
-
             string[] voiceChannels = Directory.GetDirectories(App.GetPath("vc_state/channels/"));
 
             if(voiceChannels is [])
             {
                 await RespondAsync(InteractionCallback.Message(new()
                 {
-                    Content = "No active voice calls.",
+                    Content = "No ongoing voice calls.",
                     Flags = MessageFlags.Get(ephemeral: ephemeral)
                 }));
 
                 return;
             }
 
-            await RespondAsync(InteractionCallback.Message(new()
+            // In case uncached names need to be fetched from the Discord API
+            await RespondAsync(InteractionCallback.DeferredMessage(MessageFlags.Get(ephemeral: ephemeral)));
+
+            await FollowupAsync(new()
             {
                 Embeds =
                 [
                     new EmbedProperties()
                     {
                         Title = "Voice Channel State",
-                        Fields = voiceChannels.Select(vc => new EmbedFieldProperties()
+                        Fields = voiceChannels.Select(vcPath => new EmbedFieldProperties()
                         {
-                            Name = $"<#{Path.GetFileName(vc)}>",
-                            Value = string.Join("\n", Directory.GetFiles($"{vc}/history")
-                                .Select(Path.GetFileName)
-                                .Where(f => f != "session_start")
-                                .Select(user => $"<@{user}> ({(File.Exists(App.GetPath($"{vc}/active/{user}")) ? "active" : "left")})")
-                            ),
+                            Name = $"<#{Path.GetFileName(vcPath)}>",
+                            Value = 
+                                "```\n" +
+                                string.Join("\n", Directory.GetFiles($"{vcPath}/history")
+                                    .Select(Path.GetFileName)
+                                    .Where(f => f != "session_start")
+                                    .Select(u => (
+                                        left: !File.Exists(App.GetPath($"{vcPath}/active/{u}")),
+                                        name: src.UserCache.GetName(u64.Parse(u))
+                                    ))
+                                    .OrderBy(u => u.left ? 1 : 0)
+                                    .Select(u => $"[ {(u.left ? 'X' : ' ')} ]  {u.name}")
+                                ) +
+                                "```",
                             Inline = true
                         }),
                         Color = new((i32)Random.Shared.NextRgb())
@@ -50,10 +58,10 @@ public sealed partial class DebugCommands
                     }
                 ],
                 Flags = MessageFlags.Get(ephemeral: ephemeral)
-            }));
+            });
         }
 
-        [SubSlashCommand("clear", "Clear the vc_state directory.")]
+        [SubSlashCommand("clear", "[!] Clear the vc_state directory.")]
         public async Task Clear(bool ephemeral = true)
         {
             if(!await App.CheckForOwner(Context))

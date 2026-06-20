@@ -13,7 +13,7 @@ public sealed partial class DebugCommands
         private const BindingFlags BindingAttr = BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase;
 
 
-        [SubSlashCommand("get", "Get a config value.")]
+        [SubSlashCommand("get", "[!] Get a config value.")]
         public async Task Get(Config.Field name, bool ephemeral = true)
         {
             if(!await App.CheckForOwner(Context))
@@ -38,7 +38,7 @@ public sealed partial class DebugCommands
             }
         }
 
-        [SubSlashCommand("set", "Set a config value.")]
+        [SubSlashCommand("set", "[!] Set a config value.")]
         public async Task Set(Config.Field name, bool? @bool = null, string str = null, u8? u8 = null, i32? i32 = null, u32? u32 = null, i64? i64 = null, u64? u64 = null, f32? f32 = null, f64? f64 = null, string u64str = null, bool ephemeral = true)
         {
             if(!await App.CheckForOwner(Context))
@@ -68,7 +68,7 @@ public sealed partial class DebugCommands
             }
         }
 
-        [SubSlashCommand("list", "Get a list of all config names, types, and values.")]
+        [SubSlashCommand("list", "[!] Get a list of all config names, types, and values.")]
         public async Task List(bool ephemeral = true)
         {
             if(!await App.CheckForOwner(Context))
@@ -84,7 +84,7 @@ public sealed partial class DebugCommands
             }));
         }
 
-        [SubSlashCommand("load", "Load the config from disk.")]
+        [SubSlashCommand("load", "[!] Load the config from disk.")]
         public async Task Load(bool ephemeral = true)
         {
             if(!await App.CheckForOwner(Context))
@@ -99,7 +99,7 @@ public sealed partial class DebugCommands
             }));
         }
 
-        [SubSlashCommand("save", "Save the config to disk.")]
+        [SubSlashCommand("save", "[!] Save the config to disk.")]
         public async Task Save(bool ephemeral = true)
         {
             if(!await App.CheckForOwner(Context))

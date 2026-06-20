@@ -6,5 +6,5 @@ namespace src.MessageLog;
 public sealed class MessageDeletedHandler : IMessageDeleteGatewayHandler
 {
     public async ValueTask HandleAsync(MessageDeleteEventArgs args)
-        => MessageLogMgr.MessageDeleted(args.GuildId ?? 0, args.ChannelId, args.MessageId);
+        => MessageLogMgr.MessageDeleted(args.GuildId ?? 0ul, args.ChannelId, args.MessageId);
 }

@@ -44,7 +44,7 @@ public sealed class CallStatisticsCommands : ApplicationCommandModule<Applicatio
         IEnumerable<(string name, string timeStr)> fmtStats = stats
             .OrderByDescending(stat => stat.seconds)
             .Select(stat => (
-                name: UserCache.GetName(stat.id).GetAwaiter().GetResult(),
+                name: UserCache.GetName(stat.id),
                 timeStr: App.GetTimeStr(TimeSpan.FromSeconds(stat.seconds))
             ));
 
@@ -68,5 +68,20 @@ public sealed class CallStatisticsCommands : ApplicationCommandModule<Applicatio
             ],
             Flags = MessageFlags.Get(ephemeral: ephemeral)
         });
+    }
+
+    [SubSlashCommand("remove", "[!] Remove a user from the call statistics.")]
+    public async Task Remove(User user, bool ephemeral = true)
+    {
+        if(!await App.CheckForOwner(Context))
+            return;
+
+        CallStatistics.RemoveUser(user.Id);
+
+        await RespondAsync(InteractionCallback.Message(new()
+        {
+            Content = $"Successfully removed <@{user.Id}> from the call statistics.",
+            Flags = MessageFlags.Get(ephemeral: ephemeral)
+        }));
     }
 }

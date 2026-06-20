@@ -32,4 +32,7 @@ public static class CallStatistics
                 id: u64.Parse(Path.GetFileName(f)),
                 seconds: u32.Parse(File.ReadAllText(f).Trim())))
             .ToArray();
+
+    public static void RemoveUser(u64 userId)
+        => File.Delete(App.GetPath($"call_stats/{userId}"));
 }

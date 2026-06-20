@@ -11,7 +11,7 @@ public sealed partial class DebugCommands
     [SubSlashCommand("rules", "rules")]
     public sealed class Rules : ApplicationCommandModule<ApplicationCommandContext>
     {
-        [SubSlashCommand("reload", "Reload rules.")]
+        [SubSlashCommand("reload", "[!] Reload rules.")]
         public async Task Reload(bool ephemeral = true)
         {
             if(!await App.CheckForOwner(Context))
@@ -50,9 +50,6 @@ public sealed partial class DebugCommands
         [SubSlashCommand("clear-cooldowns", "Clear all rule cooldowns.")]
         public async Task ClearCooldowns(bool ephemeral = true)
         {
-            if(!await App.CheckForOwner(Context))
-                return;
-
             Predicate.cooldowns.Clear();
             await RespondAsync(InteractionCallback.Message(new()
             {

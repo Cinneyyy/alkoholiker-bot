@@ -1,3 +1,4 @@
+#if false
 using NetCord;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
@@ -128,3 +129,4 @@ public sealed class SoundboardCommands : ApplicationCommandModule<ApplicationCom
                 .Select(sound => new ButtonProperties($"{buttonId}:{sound.guid}", sound.displayName, buttonStyle)))
             );
 }
+#endif

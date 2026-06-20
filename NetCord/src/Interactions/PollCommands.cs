@@ -10,7 +10,7 @@ public sealed class PollInteractions : ApplicationCommandModule<ApplicationComma
     private static readonly string[] maybeEmojis = ["🤙", "😶", "💀", "👁️", "🧓", "🇳🇱"];
 
 
-    [SubSlashCommand("binary", "Create a binary (yes/no) choice poll.")]
+    [SubSlashCommand("yes-no", "Create a yes/no choice poll.")]
     public async Task Binary(
         string question,
         [SlashCommandParameter(Description = "Poll duration in hours.", MinValue = 1.0, MaxValue = 768.0)] u32 duration,
