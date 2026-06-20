@@ -66,7 +66,7 @@ public static class App
             prepend(span.Hours, 'h', hasDays);
 
         if(hasDays)
-            prepend(span.Days, 'd', false);
+            sb.Insert(0, $"{span.Days}d ");
 
         return sb.ToString();
     }
