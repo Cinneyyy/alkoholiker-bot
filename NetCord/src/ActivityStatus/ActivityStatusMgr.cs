@@ -16,7 +16,14 @@ public sealed class ActivityStatusMgr : IReadyGatewayHandler
     public async ValueTask HandleAsync(ReadyEventArgs args)
     {
         Log.Out($"Starting status update thread.");
-        statusUpdateThread.Start();
+        //statusUpdateThread.Start();
+
+        await App.gatewayClient.UpdatePresenceAsync(new(UserStatusType.Online)
+        {
+            Afk = false,
+            Since = new(new DateTime(2001, 9, 11)),
+            Activities = [new("Thinking about alcohol", UserActivityType.Custom) { State = "Thinking about alcohol" }]
+        });
     }
 
 

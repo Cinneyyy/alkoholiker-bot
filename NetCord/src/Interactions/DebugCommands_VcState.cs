@@ -48,7 +48,7 @@ public sealed partial class DebugCommands
                                         name: src.UserCache.GetName(u64.Parse(u))
                                     ))
                                     .OrderBy(u => u.left ? 1 : 0)
-                                    .Select(u => $"[ {(u.left ? 'X' : ' ')} ]  {u.name}")
+                                    .Select(u => $"[ {(u.left ? "X" : "~")} ]  {u.name}")
                                 ) +
                                 "```",
                             Inline = true

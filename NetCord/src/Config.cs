@@ -34,7 +34,7 @@ public readonly struct Config
         get => customEmojiFallback;
         set => customEmojiFallback = value;
     }
-    [JsonInclude, JsonPropertyName(nameof(callHistoryChannel))] private readonly u64 _callHistoryChannel
+    [JsonInclude, JsonPropertyName(nameof(callHistoryChannel))] private readonly string _callHistoryChannel
     {
         get => callHistoryChannel;
         set => callHistoryChannel = value;
@@ -54,7 +54,7 @@ public readonly struct Config
     public static u32 defaultRuleCooldownSeconds { get; private set; } = 0u;
     public static bool logRuleFailure { get; private set; } = false;
     public static string customEmojiFallback { get; private set; } = "🇭";
-    public static u64 callHistoryChannel { get; private set; } = 0ul;
+    public static string callHistoryChannel { get; private set; } = null;
     public static bool logSolitaryCalls { get; private set; } = false;
     public static i32 activityChangeIntervalMs { get; private set; } = 60000;
 

@@ -10,10 +10,11 @@ using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
 using NetCord.Services.ComponentInteractions;
 using src;
-using src.ActivityStatus;
 using src.Rules;
 using src.Rules.Opt;
 using src.Soundboard;
+
+AppDomain.CurrentDomain.UnhandledException += (_, args) => Log.Out($"Unhandeled exception: {args.ExceptionObject}");
 
 Secrets.Load(
 #if DEBUG

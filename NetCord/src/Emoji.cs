@@ -40,7 +40,7 @@ public readonly record struct Emoji
         if(emoji.Contains(':'))
 #if DEBUG
         {
-            Console.WriteLine($"Substituting emoji {emoji} with {Config.customEmojiFallback}");
+            Log.Out($"Substituting emoji {emoji} with {Config.customEmojiFallback}");
             return new("🇭");
         }
 #elif RELEASE

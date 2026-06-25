@@ -67,11 +67,14 @@ public static class CallHistoryMgr
         else
             Log.Out($"Call ended in {guildId}:{channel}, with user {user}.");
 
+        if(string.IsNullOrEmpty(Config.callHistoryChannel))
+            return;
+
         TimeSpan time = TimeSpan.FromTicks(DateTime.UtcNow.Ticks - sessionStart);
 
         RestGuild guild = await App.restClient.GetGuildAsync(guildId);
         IReadOnlyList<IGuildChannel> guildChannels = await guild.GetChannelsAsync();
-        TextGuildChannel textChannel = guildChannels.First(c => c.Id == Config.callHistoryChannel) as TextGuildChannel;
+        TextGuildChannel textChannel = guildChannels.First(c => c.Name.Equals(Config.callHistoryChannel, StringComparison.OrdinalIgnoreCase)) as TextGuildChannel;
 
         IEnumerable<(string name, string hours, string percent)> partFmtData = participants
             .Select(p => (
@@ -100,7 +103,7 @@ public static class CallHistoryMgr
                     {
                         Text = App.GetTimeStr(time)
                     },
-                    Timestamp = new(DateTime.Now.Add(time))
+                    Timestamp = new(DateTime.Now.Subtract(time))
                 }
             ],
             Flags = MessageFlags.Get(ephemeral: false)
