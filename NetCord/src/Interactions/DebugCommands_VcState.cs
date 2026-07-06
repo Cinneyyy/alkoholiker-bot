@@ -45,7 +45,7 @@ public sealed partial class DebugCommands
                                     .Where(f => f != "session_start")
                                     .Select(u => (
                                         left: !File.Exists(App.GetPath($"{vcPath}/active/{u}")),
-                                        name: src.UserCache.GetName(u64.Parse(u))
+                                        name: src.UserCache.GetName(u.ParseU64(), Context.Interaction.GuildId)
                                     ))
                                     .OrderBy(u => u.left ? 1 : 0)
                                     .Select(u => $"[ {(u.left ? "X" : "~")} ]  {u.name}")

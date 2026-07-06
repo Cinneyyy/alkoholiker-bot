@@ -1,4 +1,4 @@
-namespace src.MessageLog;
+namespace src;
 
 public static class MessageLogMgr
 {

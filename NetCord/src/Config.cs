@@ -12,7 +12,9 @@ public readonly struct Config
         customEmojiFallback,
         callHistoryChannel,
         logSolitaryCalls,
-        activityChangeIntervalMs
+        activityChangeIntervalMs,
+        casinoChannel,
+        startingCurrency
     }
 
 
@@ -49,6 +51,16 @@ public readonly struct Config
         get => activityChangeIntervalMs;
         set => activityChangeIntervalMs = value;
     }
+    [JsonInclude, JsonPropertyName(nameof(casinoChannel))] private readonly string _casinoChannel
+    {
+        get => casinoChannel;
+        set => casinoChannel = value;
+    }
+    [JsonInclude, JsonPropertyName(nameof(startingCurrency))] private readonly u32 _startingCurrency
+    {
+        get => startingCurrency;
+        set => startingCurrency = value;
+    }
 
 
     public static u32 defaultRuleCooldownSeconds { get; private set; } = 0u;
@@ -57,6 +69,8 @@ public readonly struct Config
     public static string callHistoryChannel { get; private set; } = null;
     public static bool logSolitaryCalls { get; private set; } = false;
     public static i32 activityChangeIntervalMs { get; private set; } = 60000;
+    public static string casinoChannel { get; private set; } = null;
+    public static u32 startingCurrency { get; private set; } = 0u;
 
 
 

@@ -1,3 +1,3 @@
-rsync -rav -e ssh --exclude="vc_state/*" --exclude="msg_log/*" --exclude="log.txt" --exclude="call_stats/*" \
+rsync -rav -e ssh --exclude="vc_state/*" --exclude="msg_log/*" --exclude="log.txt" --exclude="call_stats/*" --exclude="casino/user_data/*" \
     ~/.config/alkoholiker/ \
-    cinneyyy@192.168.5.82:/home/cinneyyy/.config/alkoholiker
+    cinneyyy@rb.pi:/home/cinneyyy/.config/alkoholiker

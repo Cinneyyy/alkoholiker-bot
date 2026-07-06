@@ -1,9 +1,10 @@
+using System.Text.RegularExpressions;
 using NetCord;
 using NetCord.Rest;
 
 namespace src;
 
-public readonly record struct Emoji
+public readonly partial record struct Emoji
 {
     public readonly string name = null;
     public readonly u64 id = 0ul;
@@ -49,4 +50,7 @@ public readonly record struct Emoji
         else
             return new(emoji);
     }
+
+    [GeneratedRegex(@"<a?:[a-zA-Z0-9_]+:[0-9]+>")]
+    public static partial Regex CustomEmojiRegex();
 }

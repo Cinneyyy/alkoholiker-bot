@@ -1,7 +1,7 @@
 using NetCord.Gateway;
 using NetCord.Hosting.Gateway;
 
-namespace src.MessageLog;
+namespace src;
 
 public sealed class MessageDeletedHandler : IMessageDeleteGatewayHandler
 {

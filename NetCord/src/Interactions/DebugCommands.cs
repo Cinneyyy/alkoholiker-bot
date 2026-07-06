@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using NetCord;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
@@ -30,5 +31,40 @@ public sealed partial class DebugCommands : ApplicationCommandModule<Application
             Content = $"The bot has been running for {time.Days}d {time.Hours}h {time.Minutes}m {time.Seconds}s.",
             Flags = MessageFlags.Get(ephemeral: ephemeral)
         }));
+    }
+
+    [SubSlashCommand("temp", "Display the raspberry-pi's temperature.")]
+    public async Task Temp(bool ephemeral = true)
+    {
+        string message = null;
+
+        try
+        {
+            using Process tempProcess = Process.Start(new ProcessStartInfo()
+            {
+                FileName = "vcgencmd",
+                Arguments = "measure_temp",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            });
+
+            if(tempProcess.StandardError.ReadToEnd() is string stdErr && !string.IsNullOrWhiteSpace(stdErr))
+                throw new(stdErr);
+
+            message = tempProcess.StandardOutput.ReadToEnd();
+        }
+        catch(Exception e)
+        {
+            message = $"Failed to read system temperature ({e.Message}).";
+        }
+        finally
+        {
+            await RespondAsync(InteractionCallback.Message(new()
+            {
+                Content = message,
+                Flags = MessageFlags.Get(ephemeral: ephemeral)
+            }));
+        }
     }
 }

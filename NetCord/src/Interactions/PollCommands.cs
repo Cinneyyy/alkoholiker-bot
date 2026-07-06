@@ -14,7 +14,7 @@ public sealed class PollInteractions : ApplicationCommandModule<ApplicationComma
     public async Task Binary(
         string question,
         [SlashCommandParameter(Description = "Poll duration in hours.", MinValue = 1.0, MaxValue = 768.0)] u32 duration,
-        [SlashCommandParameter(Description = "Add third \"maybe\" option.")] bool maybe = false
+        [SlashCommandParameter(Description = "Add a third \"maybe\" option.")] bool maybe = false
     )
     {
         List<MessagePollAnswerProperties> answers =

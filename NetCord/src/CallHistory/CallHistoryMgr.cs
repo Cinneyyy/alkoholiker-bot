@@ -1,5 +1,6 @@
 using NetCord;
 using NetCord.Rest;
+using src.Casino;
 
 namespace src.CallHistory;
 
@@ -54,6 +55,9 @@ public static class CallHistoryMgr
             .OrderByDescending(p => p.partSeconds)
             .ToArray();
 
+        foreach((u64 id, f32 seconds) in participants)
+            LevelUpMgr.GiveXp((guildId, id), (u32)(seconds * 125f));
+
         CallStatistics.OnVoiceCallEnd(participants.Select(p => (p.id, (u32)p.partSeconds)));
 
         i64 sessionStart = i64.Parse(File.ReadAllText(GetPath($"channels/{channel}/session_start")).Trim()); // Read time from channels/#/session_start
@@ -74,11 +78,12 @@ public static class CallHistoryMgr
 
         RestGuild guild = await App.restClient.GetGuildAsync(guildId);
         IReadOnlyList<IGuildChannel> guildChannels = await guild.GetChannelsAsync();
-        TextGuildChannel textChannel = guildChannels.First(c => c.Name.Equals(Config.callHistoryChannel, StringComparison.OrdinalIgnoreCase)) as TextGuildChannel;
+        if(guildChannels.First(c => c.Name.Equals(Config.callHistoryChannel, StringComparison.OrdinalIgnoreCase)) is not TextGuildChannel textChannel)
+            return;
 
         IEnumerable<(string name, string hours, string percent)> partFmtData = participants
             .Select(p => (
-                name: UserCache.GetName(p.id),
+                name: UserCache.GetName(p.id, guildId),
                 hours: (p.partSeconds / 3600f).ToString("0.0h"),
                 percent: (p.partSeconds / time.TotalSeconds).ToString("0%")
             ));

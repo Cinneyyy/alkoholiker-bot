@@ -10,6 +10,7 @@ using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
 using NetCord.Services.ComponentInteractions;
 using src;
+using src.Casino;
 using src.Rules;
 using src.Rules.Opt;
 using src.Soundboard;
@@ -43,6 +44,8 @@ SoundboardDb.SetPath(App.GetPath("soundboard"));
 SoundboardDb.Load();
 
 OptMgr.SetPath(App.GetPath("opted_out"));
+
+CurrencyMgr.LoadCurrencyMeta();
 
 HostApplicationBuilder hostBuilder = Host.CreateApplicationBuilder(args);
 

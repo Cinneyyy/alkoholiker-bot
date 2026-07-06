@@ -44,7 +44,7 @@ public sealed class CallStatisticsCommands : ApplicationCommandModule<Applicatio
         IEnumerable<(string name, string timeStr)> fmtStats = stats
             .OrderByDescending(stat => stat.seconds)
             .Select(stat => (
-                name: UserCache.GetName(stat.id),
+                name: UserCache.GetName(stat.id, Context.Interaction.GuildId),
                 timeStr: App.GetTimeStr(TimeSpan.FromSeconds(stat.seconds))
             ));
 
