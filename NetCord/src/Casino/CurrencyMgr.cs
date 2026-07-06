@@ -38,7 +38,7 @@ public static partial class CurrencyMgr
             ))
             .ToArray();
 
-    public static string FormatCurrency(i64 value, string currency, i32? displayLimit = null, bool trimEmojis = false)
+    public static string FormatCurrency(i64 value, string currency, i32? displayLimit = null, bool trimEmojis = false, string numberPrefix = null)
     {
         if(!currencyNames.TryGetValue(currency, out string[] currencies))
         {
@@ -86,7 +86,7 @@ public static partial class CurrencyMgr
             if(trimEmojis)
                 curr = Emoji.CustomEmojiRegex().Replace(curr, string.Empty).Trim();
 
-            sb.Append($"{currCurrValue} {curr}");
+            sb.Append($"{numberPrefix}{currCurrValue} {curr}");
 
             if(i > 0 && displaysLeft > 0)
                 sb.Append(", ");
@@ -94,10 +94,10 @@ public static partial class CurrencyMgr
 
         return sb.ToString();
     }
-    public static string FormatCurrency(long amount, GuildUserPair guildUser, i32? displayLimit = null, bool trimEmojis = false)
-        => FormatCurrency(amount, GetUserCurrencyName(guildUser), displayLimit, trimEmojis);
-    public static string FormatCurrency(GuildUserPair guildUser, i32? displayLimit = null, bool trimEmojis = false)
-        => FormatCurrency(GetRawCurrency(guildUser), GetUserCurrencyName(guildUser), displayLimit, trimEmojis);
+    public static string FormatCurrency(long amount, GuildUserPair guildUser, i32? displayLimit = null, bool trimEmojis = false, string numberPrefix = null)
+        => FormatCurrency(amount, GetUserCurrencyName(guildUser), displayLimit, trimEmojis, numberPrefix);
+    public static string FormatCurrency(GuildUserPair guildUser, i32? displayLimit = null, bool trimEmojis = false, string numberPrefix = null)
+        => FormatCurrency(GetRawCurrency(guildUser), GetUserCurrencyName(guildUser), displayLimit, trimEmojis, numberPrefix);
 
 
     [GeneratedRegex(@"\(([a-zA-Z0-9]+)\)")]
