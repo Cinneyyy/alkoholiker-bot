@@ -1,5 +1,6 @@
 using NetCord;
 using NetCord.Rest;
+using NetCord.Services.ApplicationCommands;
 
 namespace src.Casino;
 
@@ -48,5 +49,29 @@ public static class CasinoMgr
         u32 reward = LevelUpMgr.GetRequiredXp(newLevel-1)*10;
         reward += (u32)Random.Shared.Next(-(i32)reward / 8, (i32)reward / 8);
         return reward;
+    }
+
+    public static async Task<bool> IsValidAmount(ApplicationCommandContext context, u32 amount)
+    {
+        async Task<bool> fail(string err)
+        {
+            await context.Interaction.SendResponseAsync(InteractionCallback.Message(new()
+            {
+                Content = err,
+                Flags = MessageFlags.Get()
+            }));
+
+            return false;
+        }
+
+        if(context.User.IsBot)
+            return await fail("Bots cannot contain user data.");
+
+        i64 ownedCurrency = CurrencyMgr.GetRawCurrency((context.Guild.Id, context.User.Id));
+
+        if(amount > ownedCurrency)
+            return await fail("You cannot bet more than you own.");
+
+        return true;
     }
 }

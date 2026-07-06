@@ -94,6 +94,10 @@ public static partial class CurrencyMgr
 
         return sb.ToString();
     }
+    public static string FormatCurrency(long amount, GuildUserPair guildUser, i32? displayLimit = null, bool trimEmojis = false)
+        => FormatCurrency(amount, GetUserCurrencyName(guildUser), displayLimit, trimEmojis);
+    public static string FormatCurrency(GuildUserPair guildUser, i32? displayLimit = null, bool trimEmojis = false)
+        => FormatCurrency(GetRawCurrency(guildUser), GetUserCurrencyName(guildUser), displayLimit, trimEmojis);
 
 
     [GeneratedRegex(@"\(([a-zA-Z0-9]+)\)")]
