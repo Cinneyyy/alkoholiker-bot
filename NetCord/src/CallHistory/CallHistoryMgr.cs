@@ -56,7 +56,7 @@ public static class CallHistoryMgr
             .ToArray();
 
         foreach((u64 id, f32 seconds) in participants)
-            LevelUpMgr.GiveXp((guildId, id), (u32)(seconds * 125f));
+            LevelUpMgr.GiveXp((guildId, id), amountHours: seconds/3600f);
 
         CallStatistics.OnVoiceCallEnd(participants.Select(p => (p.id, (u32)p.partSeconds)));
 

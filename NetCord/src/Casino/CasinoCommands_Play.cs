@@ -77,11 +77,17 @@ public sealed partial class CasinoCommands
                 return;
             }
 
+            await RespondAsync(InteractionCallback.Message(new()
+            {
+                Content = $"Sending challenge to <@{against.Id}>.",
+                Flags = MessageFlags.Get()
+            }));
+
             string guid = Guid.NewGuid().ToString();
             RpsButtonHandler.openGames.Add(guid, (Context.User.Id, opponent.user, choice, wager));
 
             GuildUserPair user = (Context.Guild.Id, Context.User.Id);
-            await RespondAsync(InteractionCallback.Message(new()
+            await Context.Channel.SendMessageAsync(new()
             {
                 Content = $"<@{opponent.user}>, <@{Context.User.Id}> challenged you to a game of rock paper scissors. The wager is **[{CurrencyMgr.FormatCurrency(wager, user)}]**.",
                 Components =
@@ -95,7 +101,7 @@ public sealed partial class CasinoCommands
                     ])
                 ],
                 Flags = MessageFlags.Get(ephemeral: false, silent: false)
-            }));
+            });
         }
     }
 }

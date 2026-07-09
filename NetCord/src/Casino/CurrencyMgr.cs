@@ -31,12 +31,19 @@ public static partial class CurrencyMgr
         => File.WriteAllText(CasinoMgr.GetPath(guildUser, "CurrencyName", "default"), name);
 
     public static (u64 user, u32 currency)[] GetAllCurrency(u64 guild)
-        => Directory.GetFiles(App.GetPath($"casino/user_data/{guild}/"), "*_Currency")
+    {
+        string dirPath = App.GetPath($"casino/user_data/{guild}/");
+
+        if(!Directory.Exists(dirPath))
+            return [];
+
+        return Directory.GetFiles(dirPath, "*_Currency")
             .Select(f => (
                 id: f.GetFileName().Split('_').First().ParseU64(),
                 currency: File.ReadAllText(f).Trim().ParseU32()
             ))
             .ToArray();
+    }
 
     public static string FormatCurrency(i64 value, string currency, i32? displayLimit = null, bool trimEmojis = false, string numberPrefix = null)
     {
@@ -89,7 +96,7 @@ public static partial class CurrencyMgr
             sb.Append($"{numberPrefix}{currCurrValue} {curr}");
 
             if(i > 0 && displaysLeft > 0)
-                sb.Append(", ");
+                sb.Append(Config.currencySeperator);
         }
 
         return sb.ToString();

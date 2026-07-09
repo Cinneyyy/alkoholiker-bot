@@ -74,11 +74,37 @@ public sealed partial class CasinoCommands
                         Description =
                             "```\n" +
                             string.Join("\n", levelStats
-                                .Select(stat => $"[ level {stat.level.PadRight(levelPad)} ~ {stat.xp.PadLeft(xpPad)}/{stat.reqXp.PadRight(reqXpPad)} XP ]  {stat.name}")) +
+                                .Select(stat => $"[ level {stat.level.PadLeft(levelPad)} ~ {stat.xp.PadLeft(stat.reqXp.Length, '0').PadLeft(xpPad - stat.reqXp.Length, ' ')}/{stat.reqXp.PadRight(reqXpPad)} XP ]  {stat.name}")) +
                             "```",
                         Color = new((i32)Random.Shared.NextRgb())
                     }
                 ],
+                Flags = MessageFlags.Get(ephemeral: ephemeral)
+            }));
+        }
+
+        [SubSlashCommand("give-xp", "[!] Grant someone a certain amount of XP.")]
+        public async Task GiveXp(User user, u32 raw = 0u, f32 hours = 0f, bool ephemeral = true)
+        {
+            if(!await App.CheckForOwner(Context))
+                return;
+
+            if(raw == 0u && hours == 0f)
+            {
+                await RespondAsync(InteractionCallback.Message(new()
+                {
+                    Content = "Please specify an amount, either raw or in call hours.",
+                    Flags = MessageFlags.Get()
+                }));
+
+                return;
+            }
+
+            LevelUpMgr.GiveXp((Context.Guild.Id, user.Id), raw, hours);
+
+            await RespondAsync(InteractionCallback.Message(new()
+            {
+                Content = $"Granted <@{user.Id}> **{raw + LevelUpMgr.GetXpAmountFromHours(hours)} XP**.",
                 Flags = MessageFlags.Get(ephemeral: ephemeral)
             }));
         }

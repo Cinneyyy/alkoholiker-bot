@@ -82,11 +82,11 @@ public sealed partial class CasinoCommands
         [SubSlashCommand("get-all", "Display all users' currency.")]
         public async Task GetAll(bool ephemeral = true)
         {
-            IEnumerable<(string name, string currency)> currStats = CurrencyMgr.GetAllCurrency(Context.Guild.Id)
+            IEnumerable<(u64 user, string currency)> currStats = CurrencyMgr.GetAllCurrency(Context.Guild.Id)
                 .OrderByDescending(stat => stat.currency)
                 .Select(c => (
-                    name: UserCache.GetName(c.user, Context.Guild.Id),
-                    currency: CurrencyMgr.FormatCurrency(c.currency, CurrencyMgr.GetUserCurrencyName((Context.Guild.Id, c.user)), 2, true)
+                    user: c.user,
+                    currency: CurrencyMgr.FormatCurrency(c.currency, (Context.Guild.Id, c.user))
                 ));
 
             if(!currStats.Any())
@@ -100,9 +100,6 @@ public sealed partial class CasinoCommands
                 return;
             }
 
-            i32 namePad = currStats.Max(stat => stat.name.Length);
-            i32 currPad = currStats.Max(stat => stat.currency.Length);
-
             await RespondAsync(InteractionCallback.Message(new()
             {
                 Embeds =
@@ -110,14 +107,33 @@ public sealed partial class CasinoCommands
                     new()
                     {
                         Title = "Currency",
-                        Description =
-                            "```\n" +
-                            string.Join("\n", currStats
-                                .Select(stat => $"{stat.currency.PadRight(currPad)} ~ {stat.name.PadRight(namePad)}")) +
-                            "```",
+                        Description = string.Join("\n", currStats
+                            .Select(stat => $"<@{stat.user}>: **[{stat.currency}]**")
+                        ),
                         Color = new((i32)Random.Shared.NextRgb())
                     }
                 ],
+                Flags = MessageFlags.Get(ephemeral: ephemeral)
+            }));
+        }
+
+        [SubSlashCommand("format", "See what a certain amount of currency looks like when formatted.")]
+        public async Task Format(u32 amount, string currency, bool trimEmojis = false, i32? displayLimit = null, string numberPrefix = null, bool ephemeral = true)
+        {
+            if(!CurrencyMgr.currencyNames.ContainsKey(currency))
+            {
+                await RespondAsync(InteractionCallback.Message(new()
+                {
+                    Content = $"Invalid currency; see available currencies via `/casino currency list`.",
+                    Flags = MessageFlags.Get()
+                }));
+
+                return;
+            }
+
+            await RespondAsync(InteractionCallback.Message(new()
+            {
+                Content = CurrencyMgr.FormatCurrency(amount, currency, displayLimit, trimEmojis, numberPrefix),
                 Flags = MessageFlags.Get(ephemeral: ephemeral)
             }));
         }
@@ -165,7 +181,7 @@ public sealed partial class CasinoCommands
 
             await RespondAsync(InteractionCallback.Message(new()
             {
-                Content = $"Donated {CurrencyMgr.FormatCurrency(amount, CurrencyMgr.GetUserCurrencyName(self))} to <@{target.user}> (you now have {CurrencyMgr.FormatCurrency(CurrencyMgr.GetRawCurrency(self), CurrencyMgr.GetUserCurrencyName(self))}; they now have {CurrencyMgr.FormatCurrency(CurrencyMgr.GetRawCurrency(target), CurrencyMgr.GetUserCurrencyName(target))}).",
+                Content = $"Donated **[{CurrencyMgr.FormatCurrency(amount, CurrencyMgr.GetUserCurrencyName(self))}**] to <@{target.user}> (you now have **[{CurrencyMgr.FormatCurrency(CurrencyMgr.GetRawCurrency(self), CurrencyMgr.GetUserCurrencyName(self))}**]; they now have **[{CurrencyMgr.FormatCurrency(CurrencyMgr.GetRawCurrency(target), CurrencyMgr.GetUserCurrencyName(target))}]**).",
                 Flags = MessageFlags.Get(ephemeral: false)
             }));
         }

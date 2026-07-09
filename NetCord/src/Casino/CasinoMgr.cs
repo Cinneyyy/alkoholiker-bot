@@ -16,15 +16,14 @@ public static class CasinoMgr
         if(guildChannels.First(c => c.Name.Equals(Config.casinoChannel, StringComparison.OrdinalIgnoreCase)) is not TextGuildChannel textChannel)
             return;
 
-        string currency = CurrencyMgr.GetUserCurrencyName(guildUser);
         await textChannel.SendMessageAsync(new()
         {
             Embeds =
             [
                 new()
                 {
-                    Title = $"<@{guildUser.user}> achieved level {level}",
-                    Description = $"You earned {CurrencyMgr.FormatCurrency(reward, currency)} and now have {CurrencyMgr.FormatCurrency(CurrencyMgr.GetRawCurrency(guildUser), currency)}",
+                    Title = $"Level up!",
+                    Description = $"<@{guildUser.user}> achieved level **{level}**!\n\nThey earned **[{CurrencyMgr.FormatCurrency(reward, guildUser)}]**.\nThey now have **[{CurrencyMgr.FormatCurrency(guildUser)}]**.\n\nXP required for level **{level+1}**: **{LevelUpMgr.GetRequiredXp(level)}**",
                     Color = new((i32)Random.Shared.NextRgb())
                 }
             ],

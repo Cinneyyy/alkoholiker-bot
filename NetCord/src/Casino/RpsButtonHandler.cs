@@ -22,10 +22,21 @@ public sealed class RpsButtonHandler : ComponentInteractionModule<ButtonInteract
 
             return;
         }
-        else
-            openGames.Remove(guid);
 
         (u64 challengerId, u64 opponentId, RpsChoice challengerValue, u32 wager) = gameData;
+
+        if(Context.User.Id != opponentId)
+        {
+            await RespondAsync(InteractionCallback.Message(new()
+            {
+                Content = "You cannot accept a challenge directed at someone else.",
+                Flags = MessageFlags.Get()
+            }));
+
+            return;
+        }
+
+        openGames.Remove(guid);
 
         GuildUserPair challenger = (Context.Guild.Id, challengerId);
         GuildUserPair opponent = (Context.Guild.Id, opponentId);
@@ -66,7 +77,7 @@ public sealed class RpsButtonHandler : ComponentInteractionModule<ButtonInteract
                 new()
                 {
                     Title = "Rock paper scissors result.",
-                    Description = $"<@{winner.user}> chose `{FormatChoice(winningChoice)}` and won.\n<@{loser.user}> chose `{FormatChoice(losingChoice)}` and lost.\n\n**[{CurrencyMgr.FormatCurrency(wager, winner)}]** was transferred from <@{loser.user}> to <@{winner.user}>.",
+                    Description = $"<@{winner.user}> won with `{FormatChoice(winningChoice)}`.\n<@{loser.user}> lost with `{FormatChoice(losingChoice)}`.\n\n**[{CurrencyMgr.FormatCurrency(wager, winner)}]** was transferred from <@{loser.user}> to <@{winner.user}>.",
                     Color = new((i32)Random.Shared.NextRgb())
                 }
             ],
@@ -87,8 +98,19 @@ public sealed class RpsButtonHandler : ComponentInteractionModule<ButtonInteract
 
             return;
         }
-        else
-            openGames.Remove(guid);
+
+        if(Context.User.Id != gameData.opponent)
+        {
+            await RespondAsync(InteractionCallback.Message(new()
+            {
+                Content = "You cannot decline a challenge directed at someone else.",
+                Flags = MessageFlags.Get()
+            }));
+
+            return;
+        }
+
+        openGames.Remove(guid);
 
         await RespondAsync(InteractionCallback.Message(new()
         {
@@ -96,8 +118,8 @@ public sealed class RpsButtonHandler : ComponentInteractionModule<ButtonInteract
             [
                 new()
                 {
-                    Title = $"<@{gameData.challenger}>",
-                    Description = $"<@{gameData.opponent}> declined your challenge.",
+                    Title = $"Challenge declined",
+                    Description = $"<@{gameData.challenger}>,\n<@{gameData.opponent}> declined your challenge.",
                     Color = new((i32)Random.Shared.NextRgb())
                 }
             ],

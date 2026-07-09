@@ -10,7 +10,7 @@ public sealed class RpsCommands : ApplicationCommandModule<ApplicationCommandCon
     [SubSlashCommand("paper", "paper")]
     public sealed class Sub : ApplicationCommandModule<ApplicationCommandContext>
     {
-        [SubSlashCommand("scissors", "Play Rock Paper Scissors.")]
+        [SubSlashCommand("scissors", "Play rock paper scissors.")]
         public async Task PlayRps()
             => await RespondAsync(InteractionCallback.Message(new()
             {

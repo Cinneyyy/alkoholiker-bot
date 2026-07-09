@@ -20,9 +20,12 @@ public static class LevelUpMgr
             GiveXp((guildId, message.Author.Id), GetMessageValue(message));
     }
 
-    public static void GiveXp(GuildUserPair guildUser, u32 amount)
+    public static void GiveXp(GuildUserPair guildUser, u32 amountRaw = 0u, f32 amountHours = 0f)
     {
-        u32 xp = GetStat(guildUser, Stat.Xp) + amount;
+        if(amountRaw == 0u && amountHours == 0f)
+            return;
+
+        u32 xp = GetStat(guildUser, Stat.Xp) + amountRaw + GetXpAmountFromHours(amountHours);
         u32 level = GetStat(guildUser, Stat.Level);
 
         if(xp < GetRequiredXp(level))
@@ -45,14 +48,23 @@ public static class LevelUpMgr
         _ = CasinoMgr.OnLevelUp(guildUser, level, reward);
     }
 
+    public static u32 GetXpAmountFromHours(f32 hours)
+        => (u32)(125f * hours);
+
     public static u32 GetStat(GuildUserPair guildUser, Stat stat)
         => File.ReadAllText(CasinoMgr.GetPath(guildUser, stat.ToString(), "0")).Trim().ParseU32();
 
     public static u32 GetRequiredXp(u32 currLevel)
-        => 1000u + (currLevel * 500u);
+        => 1000u + (currLevel * 250u);
 
     public static (u64 user, u32 level, u32 xp)[] GetGuildUserStats(u64 guild)
-        => Directory.GetFiles(App.GetPath($"casino/user_data/{guild}/"), $"*_{Stat.Xp}")
+    {
+        string dirPath = App.GetPath($"casino/user_data/{guild}/");
+
+        if(!Directory.Exists(dirPath))
+            return [];
+
+        return Directory.GetFiles(dirPath, $"*_{Stat.Xp}")
             .Select(Path.GetFileName)
             .Select(f => f[..f.IndexOf('_')])
             .Select(u64.Parse)
@@ -62,6 +74,7 @@ public static class LevelUpMgr
                 xp: GetStat((guild, u), Stat.Xp)
             ))
             .ToArray();
+    }
 
 
     private static u32 GetMessageValue(Message message)
@@ -82,15 +95,15 @@ public static class LevelUpMgr
             i64 deltaMins = (now - timeStamp) / TimeSpan.TicksPerMinute;
 
             // Message pause
-            // < 15mins => 0 points
-            // 15-60mins ~ 0-50 points
-            if(deltaMins >= 15)
-                value += 50u * ((u32)i64.Clamp(deltaMins, 15, 60) - 15u) / (60u-15u);
+            // < 1min => 0 points
+            // 1-15 ~ 0-50 points
+            if(deltaMins >= 1)
+                value += 50u * ((u32)i64.Clamp(deltaMins, 1, 15) - 1u) / (15u-1u);
         }
 
         lastMessageTimeStamps[guildUser] = now;
 
-        return value;
+        return value * 2; // 0-100 => 0-200
     }
 
     private static void SetStat(GuildUserPair guildUser, Stat stat, u32 value)

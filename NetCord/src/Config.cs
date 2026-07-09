@@ -14,7 +14,8 @@ public readonly struct Config
         logSolitaryCalls,
         activityChangeIntervalMs,
         casinoChannel,
-        startingCurrency
+        startingCurrency,
+        currencySeperator
     }
 
 
@@ -61,6 +62,11 @@ public readonly struct Config
         get => startingCurrency;
         set => startingCurrency = value;
     }
+    [JsonInclude, JsonPropertyName(nameof(currencySeperator))] private readonly string _currencySeperator
+    {
+        get => currencySeperator;
+        set => currencySeperator = value;
+    }
 
 
     public static u32 defaultRuleCooldownSeconds { get; private set; } = 0u;
@@ -71,6 +77,7 @@ public readonly struct Config
     public static i32 activityChangeIntervalMs { get; private set; } = 60000;
     public static string casinoChannel { get; private set; } = null;
     public static u32 startingCurrency { get; private set; } = 0u;
+    public static string currencySeperator { get; private set; } = ", ";
 
 
 
