@@ -1,3 +1,6 @@
+using NetCord.Rest;
+using src.LiveStats;
+
 namespace src.CallHistory;
 
 public static class CallStatistics
@@ -16,6 +19,8 @@ public static class CallStatistics
 
             File.WriteAllText(path, stat.ToString());
         }
+
+        _ = LiveStatsMgr.UpdateStatMessages(LiveStatsType.CallStats);
     }
 
     public static u32 GetUserCallSeconds(u64 userId)
@@ -35,4 +40,44 @@ public static class CallStatistics
 
     public static void RemoveUser(u64 userId)
         => File.Delete(App.GetPath($"call_stats/{userId}"));
+
+    public static MessageProperties CreateStatMessage(u64 guildId)
+    {
+        (u64 id, u32 seconds)[] stats = GetAllCallSeconds();
+
+        if(stats is [])
+        {
+            return new()
+            {
+                Content = $"No user has spent any time in voice channels.",
+            };
+        }
+
+        IEnumerable<(string name, string timeStr)> fmtStats = stats
+            .OrderByDescending(stat => stat.seconds)
+            .Select(stat => (
+                name: UserCache.GetName(stat.id, guildId),
+                timeStr: App.GetTimeStr(TimeSpan.FromSeconds(stat.seconds))
+            ));
+
+        i32 timePad = fmtStats.First().timeStr.Length;
+
+        return new()
+        {
+            Embeds =
+            [
+                new()
+                {
+                    Title = "Call statistics",
+                    Color = new((i32)Random.Shared.NextRgb()),
+                    Description =
+                        "```\n" +
+                        string.Join("\n", fmtStats
+                            .Select(stat => $"[ {stat.timeStr.PadLeft(timePad)} ]  {stat.name}")
+                        ) +
+                        "```"
+                }
+            ]
+        };
+    }
 }

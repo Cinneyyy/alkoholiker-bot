@@ -1,6 +1,7 @@
 using NetCord;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
+using src.LiveStats;
 
 namespace src.Casino;
 
@@ -72,5 +73,80 @@ public static class CasinoMgr
             return await fail("You cannot bet more than you own.");
 
         return true;
+    }
+
+    public static MessageProperties CreateLevelStatMessage(u64 guildId)
+    {
+
+        IEnumerable<(string name, string xp, string reqXp, string level)> levelStats = LevelUpMgr.GetGuildUserStats(guildId)
+            .OrderByDescending(stat => stat.xp)
+            .OrderByDescending(stat => stat.level)
+            .Select(stat => (
+                name: UserCache.GetName(stat.user, guildId),
+                xp: stat.xp.ToString(),
+                reqXp: LevelUpMgr.GetRequiredXp(stat.level).ToString(),
+                level: stat.level.ToString()
+            ));
+
+        if(!levelStats.Any())
+        {
+            return new()
+            {
+                Content = $"No user has any level progress."
+            };
+        }
+
+        i32 reqXpPad = levelStats.Max(stat => stat.reqXp.Length);
+        i32 levelPad = levelStats.Max(stat => stat.level.Length);
+
+        return new() 
+        {
+            Embeds =
+            [
+                new()
+                {
+                    Title = "Levels",
+                    Description =
+                        "```\n" +
+                        string.Join("\n", levelStats
+                            .Select(stat => $"[ level {stat.level.PadLeft(levelPad)} ~ {stat.xp.PadLeft(stat.reqXp.Length, '0').PadLeft(reqXpPad - stat.reqXp.Length)}/{stat.reqXp.PadRight(reqXpPad)} XP ]  {stat.name}")) +
+                        "```",
+                    Color = new((i32)Random.Shared.NextRgb())
+                }
+            ]
+        };
+    }
+
+    public static MessageProperties CreateCurrencyStatMessage(u64 guildId)
+    {
+        IEnumerable<(u64 user, string currency)> currStats = CurrencyMgr.GetAllCurrency(guildId)
+            .OrderByDescending(stat => stat.currency)
+            .Select(c => (
+                user: c.user,
+                currency: CurrencyMgr.FormatCurrency(c.currency, (guildId, c.user))
+            ));
+
+        if(!currStats.Any())
+        {
+            return new()
+            {
+                Content = "Nobody has any currency."
+            };
+        }
+
+        return new()
+        {
+            Embeds =
+            [
+                new()
+                {
+                    Title = "Currency",
+                    Description = string.Join("\n", currStats
+                        .Select(stat => $"<@{stat.user}>: **[{stat.currency}]**")
+                    ),
+                    Color = new((i32)Random.Shared.NextRgb())
+                }
+            ]
+        };
     }
 }

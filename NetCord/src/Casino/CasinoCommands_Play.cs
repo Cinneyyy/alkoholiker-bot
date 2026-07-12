@@ -48,60 +48,10 @@ public sealed partial class CasinoCommands
             }));
         }
 
-        [SubSlashCommand("rock-paper-scissors", "Play rock paper scissors against someone.")]
-        public async Task RockPaperScissors(RpsChoice choice, User against, u32 wager)
-        {
-            if(!await CasinoMgr.IsValidAmount(Context, wager))
-                return;
+        // [SubSlashCommand("lootbox", "Buy a lootbox and hope you get something good.")]
+        // public async Task Lootbox()
+        // {
+        // }
 
-            if(against.Id == Context.User.Id || against.IsBot)
-            {
-                await RespondAsync(InteractionCallback.Message(new()
-                {
-                    Content = "Invalid opponent.",
-                    Flags = MessageFlags.Get()
-                }));
-
-                return;
-            }
-
-            GuildUserPair opponent = (Context.Guild.Id, against.Id);
-            if(CurrencyMgr.GetRawCurrency(opponent) < wager)
-            {
-                await RespondAsync(InteractionCallback.Message(new()
-                {
-                    Content = $"Opponent does not have enough currency (only **[{CurrencyMgr.FormatCurrency(opponent)}]**).",
-                    Flags = MessageFlags.Get()
-                }));
-
-                return;
-            }
-
-            await RespondAsync(InteractionCallback.Message(new()
-            {
-                Content = $"Sending challenge to <@{against.Id}>.",
-                Flags = MessageFlags.Get()
-            }));
-
-            string guid = Guid.NewGuid().ToString();
-            RpsButtonHandler.openGames.Add(guid, (Context.User.Id, opponent.user, choice, wager));
-
-            GuildUserPair user = (Context.Guild.Id, Context.User.Id);
-            await Context.Channel.SendMessageAsync(new()
-            {
-                Content = $"<@{opponent.user}>, <@{Context.User.Id}> challenged you to a game of rock paper scissors. The wager is **[{CurrencyMgr.FormatCurrency(wager, user)}]**.",
-                Components =
-                [
-                    new ActionRowProperties(
-                    [
-                        new ButtonProperties($"button_casino_rps_accept:{guid}:{(u8)RpsChoice.Rock}", "🪨", ButtonStyle.Primary),
-                        new ButtonProperties($"button_casino_rps_accept:{guid}:{(u8)RpsChoice.Paper}", "🧻", ButtonStyle.Primary),
-                        new ButtonProperties($"button_casino_rps_accept:{guid}:{(u8)RpsChoice.Scissors}", "✂️", ButtonStyle.Primary),
-                        new ButtonProperties($"button_casino_rps_decline:{guid}", "Decline", ButtonStyle.Primary)
-                    ])
-                ],
-                Flags = MessageFlags.Get(ephemeral: false, silent: false)
-            });
-        }
     }
 }

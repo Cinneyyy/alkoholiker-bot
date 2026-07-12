@@ -25,47 +25,13 @@ public sealed class CallStatisticsCommands : ApplicationCommandModule<Applicatio
     [SubSlashCommand("get-all", "Get all users' call statistics.")]
     public async Task GetAll(bool ephemeral = true)
     {
-        (u64 id, u32 seconds)[] stats = CallStatistics.GetAllCallSeconds();
-
-        if(stats is [])
-        {
-            await RespondAsync(InteractionCallback.Message(new()
-            {
-                Content = $"No user has spent any time in voice channels.",
-                Flags = MessageFlags.Get(ephemeral: ephemeral)
-            }));
-
-            return;
-        }
-
-        // In case uncached names need to be fetched from the Discord API
         await RespondAsync(InteractionCallback.DeferredMessage(MessageFlags.Get(ephemeral: ephemeral)));
 
-        IEnumerable<(string name, string timeStr)> fmtStats = stats
-            .OrderByDescending(stat => stat.seconds)
-            .Select(stat => (
-                name: UserCache.GetName(stat.id, Context.Interaction.GuildId),
-                timeStr: App.GetTimeStr(TimeSpan.FromSeconds(stat.seconds))
-            ));
-
-        i32 timePad = fmtStats.First().timeStr.Length;
-
+        MessageProperties message = CallStatistics.CreateStatMessage(Context.Guild?.Id ?? 0ul);
         await FollowupAsync(new()
         {
-            Embeds =
-            [
-                new()
-                {
-                    Title = "Call statistics",
-                    Color = new((i32)Random.Shared.NextRgb()),
-                    Description =
-                        "```\n" +
-                        string.Join("\n", fmtStats
-                            .Select(stat => $"[ {stat.timeStr.PadLeft(timePad)} ]  {stat.name}")
-                        ) +
-                        "```"
-                }
-            ],
+            Content = message.Content,
+            Embeds = message.Embeds,
             Flags = MessageFlags.Get(ephemeral: ephemeral)
         });
     }

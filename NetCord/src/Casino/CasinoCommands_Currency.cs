@@ -82,37 +82,12 @@ public sealed partial class CasinoCommands
         [SubSlashCommand("get-all", "Display all users' currency.")]
         public async Task GetAll(bool ephemeral = true)
         {
-            IEnumerable<(u64 user, string currency)> currStats = CurrencyMgr.GetAllCurrency(Context.Guild.Id)
-                .OrderByDescending(stat => stat.currency)
-                .Select(c => (
-                    user: c.user,
-                    currency: CurrencyMgr.FormatCurrency(c.currency, (Context.Guild.Id, c.user))
-                ));
-
-            if(!currStats.Any())
-            {
-                await RespondAsync(InteractionCallback.Message(new()
-                {
-                    Content = "Nobody has any currency.",
-                    Flags = MessageFlags.Get(ephemeral: ephemeral)
-                }));
-
-                return;
-            }
+            MessageProperties message = CasinoMgr.CreateCurrencyStatMessage(Context.Guild.Id);
 
             await RespondAsync(InteractionCallback.Message(new()
             {
-                Embeds =
-                [
-                    new()
-                    {
-                        Title = "Currency",
-                        Description = string.Join("\n", currStats
-                            .Select(stat => $"<@{stat.user}>: **[{stat.currency}]**")
-                        ),
-                        Color = new((i32)Random.Shared.NextRgb())
-                    }
-                ],
+                Content = message.Content,
+                Embeds = message.Embeds,
                 Flags = MessageFlags.Get(ephemeral: ephemeral)
             }));
         }
@@ -181,7 +156,7 @@ public sealed partial class CasinoCommands
 
             await RespondAsync(InteractionCallback.Message(new()
             {
-                Content = $"Donated **[{CurrencyMgr.FormatCurrency(amount, CurrencyMgr.GetUserCurrencyName(self))}**] to <@{target.user}> (you now have **[{CurrencyMgr.FormatCurrency(CurrencyMgr.GetRawCurrency(self), CurrencyMgr.GetUserCurrencyName(self))}**]; they now have **[{CurrencyMgr.FormatCurrency(CurrencyMgr.GetRawCurrency(target), CurrencyMgr.GetUserCurrencyName(target))}]**).",
+                Content = $"Donated **[{CurrencyMgr.FormatCurrency(amount, CurrencyMgr.GetUserCurrencyName(self))}**] to <@{target.user}> (you now have **[{CurrencyMgr.FormatCurrency(CurrencyMgr.GetRawCurrency(self), CurrencyMgr.GetUserCurrencyName(self))}]**; they now have **[{CurrencyMgr.FormatCurrency(CurrencyMgr.GetRawCurrency(target), CurrencyMgr.GetUserCurrencyName(target))}]**).",
                 Flags = MessageFlags.Get(ephemeral: false)
             }));
         }

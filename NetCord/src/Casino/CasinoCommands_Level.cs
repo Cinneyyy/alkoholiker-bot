@@ -39,46 +39,12 @@ public sealed partial class CasinoCommands
         [SubSlashCommand("get-all", "Get all users' level progress.")]
         public async Task GetAll(bool ephemeral = true)
         {
-            IEnumerable<(string name, string xp, string reqXp, string level)> levelStats = LevelUpMgr.GetGuildUserStats(Context.Guild.Id)
-                .OrderByDescending(stat => stat.xp)
-                .OrderByDescending(stat => stat.level)
-                .Select(stat => (
-                    name: UserCache.GetName(stat.user, Context.Guild.Id),
-                    xp: stat.xp.ToString(),
-                    reqXp: LevelUpMgr.GetRequiredXp(stat.level).ToString(),
-                    level: stat.level.ToString()
-                ));
-
-            if(!levelStats.Any())
-            {
-                await RespondAsync(InteractionCallback.Message(new()
-                {
-                    Content = $"No user has any level progress.",
-                    Flags = MessageFlags.Get(ephemeral: ephemeral)
-                }));
-
-                return;
-            }
-
-            i32 xpPad = levelStats.Max(stat => stat.xp.Length);
-            i32 reqXpPad = levelStats.Max(stat => stat.reqXp.Length);
-            i32 levelPad = levelStats.Max(stat => stat.level.Length);
+            MessageProperties message = CasinoMgr.CreateLevelStatMessage(Context.Guild.Id);
 
             await RespondAsync(InteractionCallback.Message(new()
             {
-                Embeds =
-                [
-                    new()
-                    {
-                        Title = "Levels",
-                        Description =
-                            "```\n" +
-                            string.Join("\n", levelStats
-                                .Select(stat => $"[ level {stat.level.PadLeft(levelPad)} ~ {stat.xp.PadLeft(stat.reqXp.Length, '0').PadLeft(xpPad - stat.reqXp.Length, ' ')}/{stat.reqXp.PadRight(reqXpPad)} XP ]  {stat.name}")) +
-                            "```",
-                        Color = new((i32)Random.Shared.NextRgb())
-                    }
-                ],
+                Content = message.Content,
+                Embeds = message.Embeds,
                 Flags = MessageFlags.Get(ephemeral: ephemeral)
             }));
         }

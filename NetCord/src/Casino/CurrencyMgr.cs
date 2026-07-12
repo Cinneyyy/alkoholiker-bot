@@ -1,5 +1,8 @@
 using System.Text;
 using System.Text.RegularExpressions;
+using NetCord.Gateway;
+using NetCord.Rest;
+using src.LiveStats;
 
 namespace src.Casino;
 
@@ -19,7 +22,10 @@ public static partial class CurrencyMgr
         => File.ReadAllText(CasinoMgr.GetPath(guildUser, "Currency", Config.startingCurrency.ToString())).Trim().ParseI64();
 
     public static void SetRawCurrency(GuildUserPair guildUser, i64 value)
-        => File.WriteAllText(CasinoMgr.GetPath(guildUser, "Currency", Config.startingCurrency.ToString()), value.ToString());
+    {
+        File.WriteAllText(CasinoMgr.GetPath(guildUser, "Currency", Config.startingCurrency.ToString()), value.ToString());
+        _ = LiveStatsMgr.UpdateStatMessages(LiveStatsType.CasinoCurrency);
+    }
 
     public static void AddCurrency(GuildUserPair guildUser, i64 addition)
         => SetRawCurrency(guildUser, GetRawCurrency(guildUser) + addition);
@@ -28,7 +34,10 @@ public static partial class CurrencyMgr
         => File.ReadAllText(CasinoMgr.GetPath(guildUser, "CurrencyName", "default")).Trim();
 
     public static void SetUserCurrencyName(GuildUserPair guildUser, string name)
-        => File.WriteAllText(CasinoMgr.GetPath(guildUser, "CurrencyName", "default"), name);
+    {
+        File.WriteAllText(CasinoMgr.GetPath(guildUser, "CurrencyName", "default"), name);
+        _ = LiveStatsMgr.UpdateStatMessages(LiveStatsType.CasinoCurrency);
+    }
 
     public static (u64 user, u32 currency)[] GetAllCurrency(u64 guild)
     {

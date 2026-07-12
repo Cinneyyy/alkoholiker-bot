@@ -56,7 +56,7 @@ public sealed class RpsButtonHandler : ComponentInteractionModule<ButtonInteract
         {
             await RespondAsync(InteractionCallback.Message(new()
             {
-                Content = $"Both players chose {FormatChoice(challengerValue)}.\nNothing has changed.",
+                Content = $"Both players chose `{FormatChoice(challengerValue)}`.\nNothing has changed.",
                 Flags = MessageFlags.Get(ephemeral: false)
             }));
 
@@ -119,7 +119,7 @@ public sealed class RpsButtonHandler : ComponentInteractionModule<ButtonInteract
                 new()
                 {
                     Title = $"Challenge declined",
-                    Description = $"<@{gameData.challenger}>,\n<@{gameData.opponent}> declined your challenge.",
+                    Description = $"<@{gameData.challenger}>, <@{gameData.opponent}> declined your challenge.",
                     Color = new((i32)Random.Shared.NextRgb())
                 }
             ],

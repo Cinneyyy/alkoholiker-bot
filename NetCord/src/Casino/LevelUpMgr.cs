@@ -1,4 +1,5 @@
 using NetCord.Gateway;
+using src.LiveStats;
 
 namespace src.Casino;
 
@@ -107,5 +108,8 @@ public static class LevelUpMgr
     }
 
     private static void SetStat(GuildUserPair guildUser, Stat stat, u32 value)
-        => File.WriteAllText(CasinoMgr.GetPath(guildUser, stat.ToString(), "0"), value.ToString());
+    {
+        File.WriteAllText(CasinoMgr.GetPath(guildUser, stat.ToString(), "0"), value.ToString());
+        _ = LiveStatsMgr.UpdateStatMessages(LiveStatsType.CasinoLevels);
+    }
 }

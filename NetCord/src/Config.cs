@@ -15,7 +15,8 @@ public readonly struct Config
         activityChangeIntervalMs,
         casinoChannel,
         startingCurrency,
-        currencySeperator
+        currencySeperator,
+        autoDeleteChannels
     }
 
 
@@ -67,6 +68,11 @@ public readonly struct Config
         get => currencySeperator;
         set => currencySeperator = value;
     }
+    [JsonInclude, JsonPropertyName(nameof(autoDeleteChannels))] private readonly u64[] _autoDeleteChannels 
+    {
+        get => autoDeleteChannels;
+        set => autoDeleteChannels = value;
+    }
 
 
     public static u32 defaultRuleCooldownSeconds { get; private set; } = 0u;
@@ -78,6 +84,7 @@ public readonly struct Config
     public static string casinoChannel { get; private set; } = null;
     public static u32 startingCurrency { get; private set; } = 0u;
     public static string currencySeperator { get; private set; } = ", ";
+    public static u64[] autoDeleteChannels { get; private set; } = [];
 
 
 
