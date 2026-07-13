@@ -1,4 +1,4 @@
-#if false
+#if true
 using NetCord;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
@@ -11,6 +11,8 @@ public sealed class SoundboardCommands : ApplicationCommandModule<ApplicationCom
     [SubSlashCommand("open", "List all the registered sounds, alongside buttons to play them.")]
     public async Task Open(bool ephemeral = true)
     {
+        Log.Out($"{UserCache.GetName(Context.User.Id, Context.Guild?.Id ?? 0ul)} invoked /soundboard open.");
+
         if(SoundboardDb.GetSounds().Count == 0)
         {
             await RespondAsync(InteractionCallback.Message(new()
@@ -30,8 +32,10 @@ public sealed class SoundboardCommands : ApplicationCommandModule<ApplicationCom
     }
 
     [SubSlashCommand("add", "Add a sound to the soundboard.")]
-    public async Task Add(string name, Attachment file, [SlashCommandParameter(MinValue = 0.0d, MaxValue = 1.0d)] f32 volume = 0.5f)
+    public async Task Add(string name, Attachment file, [SlashCommandParameter(MinValue = 0.0d, MaxValue = 1.0d)] f32 volume = 0.5f, f32? start = null, f32? end = null)
     {
+        Log.Out($"{UserCache.GetName(Context.User.Id, Context.Guild?.Id ?? 0ul)} invoked /soundboard add.");
+
         await RespondAsync(InteractionCallback.Message(new()
         {
             Content = $"Downloading `{file.FileName}`.",
@@ -44,7 +48,7 @@ public sealed class SoundboardCommands : ApplicationCommandModule<ApplicationCom
         u8[] bytes = await http.GetByteArrayAsync(file.Url);
         await File.WriteAllBytesAsync(tempFile, bytes);
 
-        SoundboardDb.AddSound(tempFile, name, f32.Round(volume, 1));
+        SoundboardDb.AddSound(tempFile, name, f32.Round(volume, 1), start, end);
 
         await FollowupAsync(new()
         {
@@ -56,6 +60,8 @@ public sealed class SoundboardCommands : ApplicationCommandModule<ApplicationCom
     [SubSlashCommand("remove", "Remove a sound from the soundboard.")]
     public async Task Remove()
     {
+        Log.Out($"{UserCache.GetName(Context.User.Id, Context.Guild?.Id ?? 0ul)} invoked /soundboard remove.");
+
         if(SoundboardDb.GetSounds().Count == 0)
         {
             await RespondAsync(InteractionCallback.Message(new()
@@ -78,6 +84,8 @@ public sealed class SoundboardCommands : ApplicationCommandModule<ApplicationCom
     [SubSlashCommand("edit", "Edit a sound in the soundboard.")]
     public async Task Edit()
     {
+        Log.Out($"{UserCache.GetName(Context.User.Id, Context.Guild?.Id ?? 0ul)} invoked /soundboard edit.");
+
         if(SoundboardDb.GetSounds().Count == 0)
         {
             await RespondAsync(InteractionCallback.Message(new()
@@ -100,6 +108,8 @@ public sealed class SoundboardCommands : ApplicationCommandModule<ApplicationCom
     [SubSlashCommand("close", "Make the bot disconnect from the voice channel.")]
     public async Task Close()
     {
+        Log.Out($"{UserCache.GetName(Context.User.Id, Context.Guild?.Id ?? 0ul)} invoked /soundboard close.");
+
         bool result = await SoundboardPlayer.Disconnect(Context.Guild.Id);
 
         if(result)
@@ -114,7 +124,7 @@ public sealed class SoundboardCommands : ApplicationCommandModule<ApplicationCom
         {
             await RespondAsync(InteractionCallback.Message(new()
             {
-                Content = "Failed to disconnect; bot is not in a voice channel.",
+                Content = "Failed to disconnect.",
                 Flags = MessageFlags.Get()
             }));
         }

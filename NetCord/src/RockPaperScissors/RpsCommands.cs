@@ -21,7 +21,7 @@ public sealed class RpsCommands : ApplicationCommandModule<ApplicationCommandCon
                         new ButtonProperties($"button_rps_select:{(u8)RpsSelection.Rock}", "🪨", ButtonStyle.Primary),
                         new ButtonProperties($"button_rps_select:{(u8)RpsSelection.Paper}", "🧻", ButtonStyle.Primary),
                         new ButtonProperties($"button_rps_select:{(u8)RpsSelection.Scissors}", "✂️", ButtonStyle.Primary),
-                        new ButtonProperties("button_rps_finish", "Fertig", ButtonStyle.Primary)
+                        new ButtonProperties("button_rps_finish", "Done", ButtonStyle.Primary)
                     ])
                 ]
             }));

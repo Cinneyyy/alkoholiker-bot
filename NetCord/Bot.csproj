@@ -17,14 +17,20 @@
     <ItemGroup>
         <None Update="secrets.release.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>        
+        </None>
         <None Update="secrets.debug.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>       
+        </None>
         <None Update="config.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="rules.txt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="libdave.so">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="libopus.so">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
 

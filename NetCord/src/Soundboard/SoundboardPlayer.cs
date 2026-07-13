@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using NetCord.Gateway;
 using NetCord.Gateway.Voice;
 
@@ -16,12 +15,14 @@ public static class SoundboardPlayer
             voiceClient = await gatewayClient.JoinVoiceChannelAsync(guildId, channelId);
             await voiceClient.StartAsync();
 
-            Console.WriteLine($"Voice client opened ({guildId}:{channelId})");
+            await gatewayClient.UpdateVoiceStateAsync(new(guildId, channelId));
+
+            Log.Out($"Voice client opened ({guildId}:{channelId})");
             voiceClients[guildId] = voiceClient;
 
             voiceClient.Disconnect += args =>
             {
-                Console.WriteLine($"Voice client closed ({guildId}:{channelId}).");
+                Log.Out($"Voice client closed ({guildId}:{channelId}).");
                 voiceClients.Remove(guildId);
                 voiceClient.Dispose();
                 return default;
@@ -30,7 +31,8 @@ public static class SoundboardPlayer
 
         if(voiceClient.ChannelId != channelId)
         {
-            await voiceClient.CloseAsync();
+            await Disconnect(guildId);
+            await Task.Delay(1000);
             await PlaySound(gatewayClient, guildId, channelId, filePath, volume);
             return;
         }
@@ -39,45 +41,16 @@ public static class SoundboardPlayer
 
         using Stream voiceStream = voiceClient.CreateVoiceStream();
         using OpusEncodeStream opusStream = new(voiceStream, PcmFormat.Short, VoiceChannels.Stereo, OpusApplication.Audio);
-
-        using Process ffmpeg = Process.Start(new ProcessStartInfo()
-        {
-            FileName = "ffmpeg",
-            Arguments = $"""
-                -hide_banner
-                -loglevel error
-                -i {filePath}
-                -vn
-                -map 0:a:0
-                -af "volume={volume}"
-                -ac 2
-                -ar 48000
-                -acodec pcm_s16le
-                -f s16le
-                pipe:1
-            """.Replace(Environment.NewLine, " "),
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true
-        });
+        using FileStream audioFileStream = File.OpenRead(filePath);
 
         try
         {
-            await ffmpeg.StandardOutput.BaseStream.CopyToAsync(opusStream);
+            await audioFileStream.CopyToAsync(opusStream);
+            await opusStream.FlushAsync();
         }
-        finally
+        catch(Exception e) 
         {
-            try
-            {
-                await opusStream.FlushAsync();    
-                Console.WriteLine("Flushed opusStream.");
-            }
-            catch
-            {
-                Console.WriteLine("Failed to flush opusStream.");
-            }
-
-            Console.WriteLine(ffmpeg.StandardError.ReadToEnd());
+            Log.Out($"Failed to flush opus stream ({filePath}; {e.Message}).");
         }
     }
 
@@ -86,7 +59,18 @@ public static class SoundboardPlayer
         if(!voiceClients.TryGetValue(guildId, out VoiceClient voiceClient))
             return false;
 
-        await voiceClient.CloseAsync();
+        voiceClients.Remove(guildId);
+
+        try
+        {
+            await voiceClient.CloseAsync();
+        }
+        finally
+        {
+            await App.gatewayClient.UpdateVoiceStateAsync(new(guildId, null));
+            voiceClient.Dispose();
+        }
+
         return true;
     }
 }
