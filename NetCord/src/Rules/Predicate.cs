@@ -36,8 +36,9 @@ public readonly partial record struct Predicate()
             return false;
         }
 
+        bool botIsPinged = message.Content.Contains(Secrets.botUserId.ToString());
+
         // check if opted out
-        bool botIsPinged = message.MentionedUsers.Any(u => u.Id == Secrets.botUserId);
         if(!botIsPinged && OptMgr.IsOptedOut(message.Author.Id))
             return failure("User is opted out.");
 

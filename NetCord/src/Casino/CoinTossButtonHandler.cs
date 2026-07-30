@@ -4,15 +4,15 @@ using NetCord.Services.ComponentInteractions;
 
 namespace src.Casino;
 
-public sealed class RpsButtonHandler : ComponentInteractionModule<ButtonInteractionContext>
+public sealed class CoinTossButtonHandler : ComponentInteractionModule<ButtonInteractionContext>
 {
-    public static readonly Dictionary<string, (u64 challenger, u64 opponent, RpsChoice challengerValue, u32 wager)> openGames = [];
+    public static readonly Dictionary<string, (u64 challenger, u64 opponent, u32 wager)> openGames = [];
 
 
-    [ComponentInteraction("button_casino_rps_accept")]
-    public async Task CasinoRpsAccept(string guid, u8 opponentValueU8)
+    [ComponentInteraction("button_casino_ct_accept")]
+    public async Task CasinoCtAccept(string guid)
     {
-        if(!openGames.TryGetValue(guid, out (u64 challenger, u64 opponent, RpsChoice challengerValue, u32 wager) gameData))
+        if(!openGames.TryGetValue(guid, out (u64 challenger, u64 opponent, u32 wager) gameData))
         {
             await RespondAsync(InteractionCallback.Message(new()
             {
@@ -23,7 +23,7 @@ public sealed class RpsButtonHandler : ComponentInteractionModule<ButtonInteract
             return;
         }
 
-        (u64 challengerId, u64 opponentId, RpsChoice challengerValue, u32 wager) = gameData;
+        (u64 challengerId, u64 opponentId, u32 wager) = gameData;
 
         if(Context.User.Id != opponentId)
         {
@@ -51,21 +51,11 @@ public sealed class RpsButtonHandler : ComponentInteractionModule<ButtonInteract
             return;
         }
 
-        RpsChoice opponentValue = (RpsChoice)opponentValueU8;
-        if(challengerValue == opponentValue)
-        {
-            await RespondAsync(InteractionCallback.Message(new()
-            {
-                Content = $"Both players chose `{FormatChoice(challengerValue)}`.\nNothing has changed.",
-                Flags = MessageFlags.Get(ephemeral: false)
-            }));
+        CoinFace coinFace = Random.Shared.NextSingle() > 0.5f ? CoinFace.Heads : CoinFace.Tails;
 
-            return;
-        }
-
-        (GuildUserPair winner, GuildUserPair loser, RpsChoice winningChoice, RpsChoice losingChoice) = (u8)challengerValue == ((u8)opponentValue+1)%3
-            ? (challenger, opponent, challengerValue, opponentValue)
-            : (opponent, challenger, opponentValue, challengerValue);
+        (GuildUserPair winner, GuildUserPair loser) = coinFace == CoinFace.Heads
+            ? (opponent, challenger)
+            : (challenger, opponent);
 
         CurrencyMgr.AddCurrency(winner, wager);
         CurrencyMgr.AddCurrency(loser, -wager);
@@ -76,8 +66,8 @@ public sealed class RpsButtonHandler : ComponentInteractionModule<ButtonInteract
             [
                 new()
                 {
-                    Title = "Rock paper scissors result.",
-                    Description = $"<@{winner.user}> won with `{FormatChoice(winningChoice)}`.\n<@{loser.user}> lost with `{FormatChoice(losingChoice)}`.\n\n**[{CurrencyMgr.FormatCurrency(wager, winner)}]** was transferred from <@{loser.user}> to <@{winner.user}>.\n\n<@{winner.user}> now has **[{CurrencyMgr.FormatCurrency(winner)}]**.\n<@{loser.user}> now has **[{CurrencyMgr.FormatCurrency(loser)}]**.",
+                    Title = "Coin toss result.",
+                    Description = $"The coin landed on `{coinFace.ToString().ToLowerInvariant()}`, thus <@{winner.user}> emerged victorious.\n\n**[{CurrencyMgr.FormatCurrency(wager, winner)}]** was transferred from <@{loser.user}> to <@{winner.user}>.\n\n<@{winner.user}> now has **[{CurrencyMgr.FormatCurrency(winner)}]**.\n<@{loser.user}> now has **[{CurrencyMgr.FormatCurrency(loser)}]**.",
                     Color = new((i32)Random.Shared.NextRgb())
                 }
             ],
@@ -85,10 +75,10 @@ public sealed class RpsButtonHandler : ComponentInteractionModule<ButtonInteract
         }));
     }
 
-    [ComponentInteraction("button_casino_rps_decline")]
+    [ComponentInteraction("button_casino_ct_decline")]
     public async Task RpsDecline(string guid)
     {
-        if(!openGames.TryGetValue(guid, out (u64 challenger, u64 opponent, RpsChoice, u32) gameData))
+        if(!openGames.TryGetValue(guid, out (u64 challenger, u64 opponent, u32) gameData))
         {
             await RespondAsync(InteractionCallback.Message(new()
             {
@@ -126,14 +116,4 @@ public sealed class RpsButtonHandler : ComponentInteractionModule<ButtonInteract
             Flags = MessageFlags.Get(ephemeral: false, silent: false)
         }));
     }
-
-
-    private static string FormatChoice(RpsChoice choice)
-        => choice switch
-        {
-            RpsChoice.Rock => "rock 🪨",
-            RpsChoice.Paper => "paper 🧻",
-            RpsChoice.Scissors => "scissors ✂️",
-            _ => throw new($"Invalid RpsSelection ({choice}).")
-        };
 }

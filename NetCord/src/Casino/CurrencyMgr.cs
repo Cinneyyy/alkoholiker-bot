@@ -24,7 +24,7 @@ public static partial class CurrencyMgr
     public static void SetRawCurrency(GuildUserPair guildUser, i64 value)
     {
         File.WriteAllText(CasinoMgr.GetPath(guildUser, "Currency", Config.startingCurrency.ToString()), value.ToString());
-        _ = LiveStatsMgr.UpdateStatMessages(LiveStatsType.CasinoCurrency);
+        //_ = LiveStatsMgr.UpdateStatMessages(LiveStatsType.CasinoCurrency);
     }
 
     public static void AddCurrency(GuildUserPair guildUser, i64 addition)
@@ -36,7 +36,7 @@ public static partial class CurrencyMgr
     public static void SetUserCurrencyName(GuildUserPair guildUser, string name)
     {
         File.WriteAllText(CasinoMgr.GetPath(guildUser, "CurrencyName", "default"), name);
-        _ = LiveStatsMgr.UpdateStatMessages(LiveStatsType.CasinoCurrency);
+        //_ = LiveStatsMgr.UpdateStatMessages(LiveStatsType.CasinoCurrency);
     }
 
     public static (u64 user, u32 currency)[] GetAllCurrency(u64 guild)
@@ -116,9 +116,9 @@ public static partial class CurrencyMgr
         => FormatCurrency(GetRawCurrency(guildUser), GetUserCurrencyName(guildUser), displayLimit, trimEmojis, numberPrefix);
 
 
-    [GeneratedRegex(@"\(([a-zA-Z0-9]+)\)")]
+    [GeneratedRegex(@"\((\w+)\)")]
     private static partial Regex PluralRegex();
 
-    [GeneratedRegex(@"\[([a-zA-Z0-9]+)\]")]
+    [GeneratedRegex(@"\[(\w+)\]")]
     private static partial Regex SingularRegex();
 }

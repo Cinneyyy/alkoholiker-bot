@@ -7,4 +7,4 @@ rsync -rav -e ssh \
     --exclude="live_stats/*" \
     --exclude="deleted/*" \
     ~/.config/alkoholiker/ \
-    cinneyyy@rb.pi:/home/cinneyyy/.config/alkoholiker
+    cinneyyy@192.168.2.100:/home/cinneyyy/.config/alkoholiker

@@ -9,10 +9,10 @@ public static class CallHistoryMgr
     public static string GetPath(string file)
         => App.GetPath($"vc_state/{file}");
 
-    public static void HandleConnect(u64 channel, u64 user)
+    public static void HandleConnect(u64 channel, u64 user, i64? ticks = null)
     {
         Log.Out($"User {user} ({App.restClient.GetUserAsync(user).GetAwaiter().GetResult().Username}) joined voice channel {channel}");
-        string now = DateTime.UtcNow.Ticks.ToString();
+        string now = ticks?.ToString() ?? DateTime.UtcNow.Ticks.ToString();
 
         if(!Directory.Exists(GetPath($"channels/{channel}"))) // User is first to join voice channel
         {
@@ -27,10 +27,10 @@ public static class CallHistoryMgr
         File.WriteAllText(GetPath($"users/{user}"), channel.ToString()); // Write channel to users/@
     }
 
-    public static async Task HandleDisconnect(u64 guildId, u64 user)
+    public static async Task HandleDisconnect(u64 guildId, u64 user, i64? ticks = null)
     {
         Log.Out($"User {user} ({App.restClient.GetUserAsync(user).GetAwaiter().GetResult().Username}) left voice channel in guild {guildId}");
-        i64 now = DateTime.UtcNow.Ticks;
+        i64 now = ticks ?? DateTime.UtcNow.Ticks;
 
         u64 channel = u64.Parse(File.ReadAllText(GetPath($"users/{user}")).Trim()); // Read channel from users/@
         File.Delete(GetPath($"users/{user}")); // Delete users/@

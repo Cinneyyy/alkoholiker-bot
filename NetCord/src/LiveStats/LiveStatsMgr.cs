@@ -35,6 +35,17 @@ public static class LiveStatsMgr
         {
             message.Content = messageProperties.Content ?? string.Empty;
             message.Embeds = messageProperties.Embeds;
+
+            if(type != LiveStatsType.CallStats)
+            {
+                message.Components =
+                [
+                    new ActionRowProperties()
+                    {
+                        new ButtonProperties($"button_live_stats:{guildId}:{channelId}:{messageId}:{(u8)type}", "Refresh", ButtonStyle.Primary)
+                    }
+                ];
+            }
         });
 
         return true;

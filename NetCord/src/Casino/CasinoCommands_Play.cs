@@ -9,13 +9,6 @@ public sealed partial class CasinoCommands
     [SubSlashCommand("play", "play")]
     public sealed class Play : ApplicationCommandModule<ApplicationCommandContext>
     {
-        public enum CoinFace : u8
-        {
-            Heads,
-            Tails
-        }
-
-
         [SubSlashCommand("coin-toss", "Bet a certain amount on heads or tails, double or nothing.")]
         public async Task CoinToss(u32 amount, CoinFace face)
         {

@@ -110,6 +110,6 @@ public static class LevelUpMgr
     private static void SetStat(GuildUserPair guildUser, Stat stat, u32 value)
     {
         File.WriteAllText(CasinoMgr.GetPath(guildUser, stat.ToString(), "0"), value.ToString());
-        _ = LiveStatsMgr.UpdateStatMessages(LiveStatsType.CasinoLevels);
+        //_ = LiveStatsMgr.UpdateStatMessages(LiveStatsType.CasinoLevels);
     }
 }

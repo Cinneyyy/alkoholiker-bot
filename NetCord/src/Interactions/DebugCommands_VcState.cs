@@ -1,6 +1,7 @@
 using NetCord;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
+using src.CallHistory;
 
 namespace src.Interactions;
 
@@ -73,6 +74,44 @@ public sealed partial class DebugCommands
             await RespondAsync(InteractionCallback.Message(new()
             {
                 Content = $"Removed vc_state/channels/ and vc_state/users/",
+                Flags = MessageFlags.Get(ephemeral: ephemeral)
+            }));
+        }
+
+        [SubSlashCommand("join", "[!] Add a user to the VC state.")]
+        public async Task Join(User user, f32? hoursAgo = null, bool ephemeral = true)
+        {
+            if(!await App.CheckForOwner(Context))
+                return;
+
+            DateTime now = DateTime.UtcNow;
+            if(hoursAgo is f32 _hoursAgo)
+                now = now.AddHours(-_hoursAgo);
+
+            CallHistoryMgr.HandleConnect(Context.Guild.Id, user.Id, now.Ticks);
+
+            await RespondAsync(InteractionCallback.Message(new()
+            {
+                Content = $"Simulated user join event for user <@{user.Id}>.",
+                Flags = MessageFlags.Get(ephemeral: ephemeral)
+            }));
+        }
+
+        [SubSlashCommand("leave", "[!] Remove a user from the VC state.")]
+        public async Task Leave(User user, f32? hoursAgo = null, bool ephemeral = true)
+        {
+            if(!await App.CheckForOwner(Context))
+                return;
+
+            DateTime now = DateTime.UtcNow;
+            if(hoursAgo is f32 _hoursAgo)
+                now = now.AddHours(-_hoursAgo);
+
+            await CallHistoryMgr.HandleDisconnect(Context.Guild.Id, user.Id, now.Ticks);
+
+            await RespondAsync(InteractionCallback.Message(new()
+            {
+                Content = $"Simulated user leave event for user <@{user.Id}>.",
                 Flags = MessageFlags.Get(ephemeral: ephemeral)
             }));
         }

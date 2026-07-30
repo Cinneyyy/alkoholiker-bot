@@ -1,3 +1,3 @@
 rsync -rav -e ssh --exclude="bin/*" --exclude="obj/*" \
     ./ \
-    cinneyyy@rb.pi:/home/cinneyyy/Desktop/Bot/
+    cinneyyy@192.168.2.100:/home/cinneyyy/Desktop/Bot/
