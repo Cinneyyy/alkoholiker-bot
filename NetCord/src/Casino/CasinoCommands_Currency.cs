@@ -1,6 +1,7 @@
 using NetCord;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
+using src.LiveStats;
 
 namespace src.Casino;
 
@@ -44,6 +45,7 @@ public sealed partial class CasinoCommands
             }
 
             GuildUserPair guildUser = (Context.Interaction.GuildId.Value, user.Id);
+            CasinoStatsMgr.OnCurrencyChange(guildUser, CurrencySource.AdminCommand, value - CurrencyMgr.GetRawCurrency(guildUser));
             CurrencyMgr.SetRawCurrency(guildUser, value);
 
             await RespondAsync(InteractionCallback.Message(new()
@@ -154,6 +156,9 @@ public sealed partial class CasinoCommands
             CurrencyMgr.AddCurrency(target, amount);
             CurrencyMgr.AddCurrency(self, -amount);
 
+            CasinoStatsMgr.OnCurrencyChange(target, CurrencySource.DonationReceive, amount);
+            CasinoStatsMgr.OnCurrencyChange(self, CurrencySource.DonationSend, -amount);
+
             await RespondAsync(InteractionCallback.Message(new()
             {
                 Content = $"Donated **[{CurrencyMgr.FormatCurrency(amount, CurrencyMgr.GetUserCurrencyName(self))}**] to <@{target.user}> (you now have **[{CurrencyMgr.FormatCurrency(CurrencyMgr.GetRawCurrency(self), CurrencyMgr.GetUserCurrencyName(self))}]**; they now have **[{CurrencyMgr.FormatCurrency(CurrencyMgr.GetRawCurrency(target), CurrencyMgr.GetUserCurrencyName(target))}]**).",
@@ -263,6 +268,19 @@ public sealed partial class CasinoCommands
             await RespondAsync(InteractionCallback.Message(new()
             {
                 Content = $"Set <@{user.Id}>'s currency preference to `{name}`.",
+                Flags = MessageFlags.Get(ephemeral: ephemeral)
+            }));
+        }
+
+        [SubSlashCommand("get-deltas", "Get a message summing up the currency deltas for each user on this server.")]
+        public async Task GetDeltas(bool ephemeral = true)
+        {
+            MessageProperties msg = CasinoStatsMgr.CreateStatMessage(Context.Guild.Id);
+
+            await RespondAsync(InteractionCallback.Message(new()
+            {
+                Content = msg.Content,
+                Embeds = msg.Embeds,
                 Flags = MessageFlags.Get(ephemeral: ephemeral)
             }));
         }

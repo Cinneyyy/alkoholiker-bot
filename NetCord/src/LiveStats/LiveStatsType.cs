@@ -4,5 +4,6 @@ public enum LiveStatsType : u8
 {
     CallStats,
     CasinoLevels,
-    CasinoCurrency
+    CasinoCurrency,
+    CurrencyDeltas
 }

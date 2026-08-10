@@ -21,6 +21,9 @@ public sealed partial class CasinoCommands
             bool won = face == randomFace;
 
             CurrencyMgr.AddCurrency(guildUser, won ? amount : -amount);
+            LevelUpMgr.OnGamble(guildUser, amount);
+            CasinoStatsMgr.OnCurrencyChange(guildUser, CurrencySource.Play_CoinToss, amount);
+
             await RespondAsync(InteractionCallback.Message(new()
             {
                 Embeds =
@@ -39,8 +42,6 @@ public sealed partial class CasinoCommands
                 ],
                 Flags = MessageFlags.Get(ephemeral: false)
             }));
-
-            LevelUpMgr.OnGamble((Context.Guild.Id, Context.User.Id), amount);
         }
 
         // [SubSlashCommand("lootbox", "Buy a lootbox and hope you get something good.")]

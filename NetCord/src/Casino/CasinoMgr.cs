@@ -10,6 +10,7 @@ public static class CasinoMgr
     public static async Task OnLevelUp(GuildUserPair guildUser, u32 level, u32 reward)
     {
         CurrencyMgr.AddCurrency(guildUser, reward);
+        CasinoStatsMgr.OnCurrencyChange(guildUser, CurrencySource.LevelUp, reward);
 
         RestGuild guild = await App.restClient.GetGuildAsync(guildUser.guild);
         IReadOnlyList<IGuildChannel> guildChannels = await guild.GetChannelsAsync();

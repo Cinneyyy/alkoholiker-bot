@@ -15,6 +15,7 @@ public static class LiveStatsMgr
             LiveStatsType.CallStats => CallStatistics.CreateStatMessage(guildId),
             LiveStatsType.CasinoCurrency => CasinoMgr.CreateCurrencyStatMessage(guildId),
             LiveStatsType.CasinoLevels => CasinoMgr.CreateLevelStatMessage(guildId),
+            LiveStatsType.CurrencyDeltas => CasinoStatsMgr.CreateStatMessage(guildId),
             _ => throw new($"Invalid LiveStatsCommands.Type: {type}.")
         };
 

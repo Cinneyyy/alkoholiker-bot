@@ -63,6 +63,9 @@ public sealed class CoinTossButtonHandler : ComponentInteractionModule<ButtonInt
         LevelUpMgr.OnGamble(winner, wager);
         LevelUpMgr.OnGamble(loser, wager);
 
+        CasinoStatsMgr.OnCurrencyChange(winner, CurrencySource.Challenge_CoinToss, wager);
+        CasinoStatsMgr.OnCurrencyChange(loser, CurrencySource.Challenge_CoinToss, -wager);
+
         await RespondAsync(InteractionCallback.Message(new()
         {
             Embeds =

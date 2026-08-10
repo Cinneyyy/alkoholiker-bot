@@ -13,6 +13,8 @@ public static class StringExtension
             => i64.Parse(str);
         public u32 ParseU32()
             => u32.Parse(str);
+        public i32 ParseI32()
+            => i32.Parse(str);
 
         public bool TryParseU64(out u64 value)
             => u64.TryParse(str, out value);
@@ -20,5 +22,7 @@ public static class StringExtension
             => i64.TryParse(str, out value);
         public bool TryParseU32(out u32 value)
             => u32.TryParse(str, out value);
+        public bool TryParseI32(out i32 value)
+            => i32.TryParse(str, out value);
     }
 }

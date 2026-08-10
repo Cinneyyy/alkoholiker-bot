@@ -114,5 +114,5 @@ public static class LevelUpMgr
     }
 
     public static void OnGamble(GuildUserPair user, u32 amount)
-        => GiveXp(user, 10 + u32.Clamp((u32)(amount / 1000f), 0u, 10u));
+        => GiveXp(user, 5u + 20u * (u32)f32.Clamp(amount / 10000f, 0f, 1f));
 }
