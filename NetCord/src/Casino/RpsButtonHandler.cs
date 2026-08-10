@@ -70,6 +70,9 @@ public sealed class RpsButtonHandler : ComponentInteractionModule<ButtonInteract
         CurrencyMgr.AddCurrency(winner, wager);
         CurrencyMgr.AddCurrency(loser, -wager);
 
+        LevelUpMgr.OnGamble(winner, wager);
+        LevelUpMgr.OnGamble(loser, wager);
+
         await RespondAsync(InteractionCallback.Message(new()
         {
             Embeds =

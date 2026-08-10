@@ -112,4 +112,7 @@ public static class LevelUpMgr
         File.WriteAllText(CasinoMgr.GetPath(guildUser, stat.ToString(), "0"), value.ToString());
         //_ = LiveStatsMgr.UpdateStatMessages(LiveStatsType.CasinoLevels);
     }
+
+    public static void OnGamble(GuildUserPair user, u32 amount)
+        => GiveXp(user, 10 + u32.Clamp((u32)(amount / 1000f), 0u, 10u));
 }

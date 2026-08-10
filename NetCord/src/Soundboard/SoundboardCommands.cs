@@ -1,4 +1,3 @@
-#if true
 using NetCord;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
@@ -24,11 +23,18 @@ public sealed class SoundboardCommands : ApplicationCommandModule<ApplicationCom
             return;
         }
 
-        await RespondAsync(InteractionCallback.Message(new()
+        await SendButtonGridMessages(Context, ephemeral, null, BuildSoundboardGrid("button_sound_play"));
+        await FollowupAsync(new()
         {
-            Components = BuildSoundboardGrid("button_sound_play"),
+            Components =
+            [
+                new ActionRowProperties()
+                {
+                    new ButtonProperties("button_sound_disconnect", "Disconnect", ButtonStyle.Danger)
+                }
+            ],
             Flags = MessageFlags.Get(ephemeral: ephemeral)
-        }));
+        });
     }
 
     [SubSlashCommand("add", "Add a sound to the soundboard.")]
@@ -73,12 +79,7 @@ public sealed class SoundboardCommands : ApplicationCommandModule<ApplicationCom
             return;
         }
 
-        await RespondAsync(InteractionCallback.Message(new()
-        {
-            Content = "Select a sound to remove.",
-            Components = BuildSoundboardGrid("button_sound_remove", ButtonStyle.Danger),
-            Flags = MessageFlags.Get()
-        }));
+        await SendButtonGridMessages(Context, true, "Select a sound to remove.", BuildSoundboardGrid("button_sound_remove", ButtonStyle.Danger));
     }
 
     [SubSlashCommand("edit", "Edit a sound in the soundboard.")]
@@ -97,12 +98,7 @@ public sealed class SoundboardCommands : ApplicationCommandModule<ApplicationCom
             return;
         }
 
-        await RespondAsync(InteractionCallback.Message(new()
-        {
-            Content = "Select a sound to edit.",
-            Components = BuildSoundboardGrid("button_sound_edit"),
-            Flags = MessageFlags.Get()
-        }));
+        await SendButtonGridMessages(Context, true, "Select a sound to edit.", BuildSoundboardGrid("button_sound_edit"));
     }
 
     [SubSlashCommand("close", "Make the bot disconnect from the voice channel.")]
@@ -131,12 +127,41 @@ public sealed class SoundboardCommands : ApplicationCommandModule<ApplicationCom
     }
 
 
-    private static IEnumerable<IMessageComponentProperties> BuildSoundboardGrid(string buttonId, ButtonStyle buttonStyle = ButtonStyle.Primary)
+    private static IEnumerable<IEnumerable<IMessageComponentProperties>> BuildSoundboardGrid(string buttonId, ButtonStyle buttonStyle = ButtonStyle.Primary)
         => SoundboardDb
             .GetSounds()
+            .OrderBy(sound => sound.displayName)
             .Chunk(5)
             .Select(sounds => new ActionRowProperties(sounds
                 .Select(sound => new ButtonProperties($"{buttonId}:{sound.guid}", sound.displayName, buttonStyle)))
-            );
+            )
+            .Chunk(5);
+
+    private static async Task SendButtonGridMessages(ApplicationCommandContext context, bool ephemeral, string mainContent, IEnumerable<IEnumerable<IMessageComponentProperties>> rows)
+    {
+        bool isFirst = true;
+
+        foreach(IEnumerable<IMessageComponentProperties> row in rows)
+        {
+            if(isFirst)
+            {
+                await context.Interaction.SendResponseAsync(InteractionCallback.Message(new()
+                {
+                    Content = mainContent,
+                    Components = row,
+                    Flags = MessageFlags.Get(ephemeral: ephemeral)
+                }));
+
+                isFirst = false;
+            }
+            else
+            {
+                await context.Interaction.SendFollowupMessageAsync(new()
+                {
+                    Components = row,
+                    Flags = MessageFlags.Get(ephemeral: ephemeral)
+                });
+            }
+        }
+    }
 }
-#endif

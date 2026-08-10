@@ -15,7 +15,7 @@ public sealed class SbButtonHandler : ComponentInteractionModule<ButtonInteracti
             await RespondAsync(InteractionCallback.Message(new()
             {
                 Content = "You cannot use the soundboard while not in a voice channel.",
-                Flags = MessageFlags.Get()    
+                Flags = MessageFlags.Get()
             }));
 
             return;
@@ -31,6 +31,8 @@ public sealed class SbButtonHandler : ComponentInteractionModule<ButtonInteracti
 
             return;
         }
+
+        Log.Out($"{UserCache.GetName(Context.User.Id, Context.Guild?.Id ?? 0ul)} invoked component interaction `button_sound_play:{guid}` (name: {sound.displayName}).");
 
         await Context.Interaction.SendResponseAsync(InteractionCallback.DeferredModifyMessage);
         await SoundboardPlayer.PlaySound(Context.Client, Context.Guild.Id, userVoiceState.ChannelId.Value, sound.filePath, sound.volume);
@@ -49,7 +51,7 @@ public sealed class SbButtonHandler : ComponentInteractionModule<ButtonInteracti
 
             return;
         }
-    
+
         await RespondAsync(InteractionCallback.Modal(new($"modal_sound_edit:{guid}", $"Edit sound {sound.displayName}")
         {
             new LabelProperties("Name", new TextInputProperties("text_input_sound_name", TextInputStyle.Short)
@@ -124,5 +126,14 @@ public sealed class SbButtonHandler : ComponentInteractionModule<ButtonInteracti
             Content = $"<@{Context.User.Id}> removed the sound `{sound.displayName}`.",
             Flags = MessageFlags.Get(ephemeral: false)
         }));
+    }
+
+    [ComponentInteraction("button_sound_disconnect")]
+    public async Task SoundDisconnect()
+    {
+        Log.Out($"{UserCache.GetName(Context.User.Id, Context.Guild?.Id ?? 0ul)} invoked component interaction `button_sound_disconnect`.");
+
+        await Context.Interaction.SendResponseAsync(InteractionCallback.DeferredModifyMessage);
+        await SoundboardPlayer.Disconnect(Context.Guild.Id);
     }
 }

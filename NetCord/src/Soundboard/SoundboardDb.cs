@@ -38,7 +38,6 @@ public static class SoundboardDb
             return;
         }
 
-
         string args = $"""
             -hide_banner
             -loglevel error
@@ -53,16 +52,10 @@ public static class SoundboardDb
         """;
 
         if(start is f32 _start)
-        {
             args += $"\n-ss {_start}";
-            Log.Out(_start.ToString());
-        }
 
         if(end is f32 _end)
-        {
             args += $"\n-to {_end}";
-            Log.Out(_end.ToString());
-        }
 
         args += "\npipe:1";
 
