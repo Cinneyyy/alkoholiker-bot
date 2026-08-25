@@ -26,7 +26,7 @@ public sealed partial class CasinoCommands
         }
 
         [SubSlashCommand("set", "[!] Set the specified user's currency to the specified value.")]
-        public async Task SetCurrency(i64 value, User user = null, bool ephemeral = true)
+        public async Task Set(i64 value, User user = null, bool ephemeral = true)
         {
             if(!await App.CheckForOwner(Context))
                 return; 
@@ -51,6 +51,38 @@ public sealed partial class CasinoCommands
             await RespondAsync(InteractionCallback.Message(new()
             {
                 Content = $"<@{user.Id}> now has {CurrencyMgr.FormatCurrency(value, CurrencyMgr.GetUserCurrencyName(guildUser))}.",
+                Flags = MessageFlags.Get(ephemeral: ephemeral)
+            }));
+        }
+
+        [SubSlashCommand("add", "[!] Add to the specified user's currency.")]
+        public async Task Add(i64 value, User user = null, bool ephemeral = true)
+        {
+            if(!await App.CheckForOwner(Context))
+                return; 
+
+            user ??= Context.User;
+
+            if(user.IsBot)
+            {
+                await RespondAsync(InteractionCallback.Message(new()
+                {
+                    Content = "A bot does not contain user data.",
+                    Flags = MessageFlags.Get(ephemeral: ephemeral)
+                }));
+
+                return;
+            }
+
+            GuildUserPair guildUser = (Context.Interaction.GuildId.Value, user.Id);
+            CasinoStatsMgr.OnCurrencyChange(guildUser, CurrencySource.AdminCommand, value);
+
+            i64 prev = CurrencyMgr.GetRawCurrency(guildUser);
+            CurrencyMgr.SetRawCurrency(guildUser, prev + value);
+
+            await RespondAsync(InteractionCallback.Message(new()
+            {
+                Content = $"<@{user.Id}> now has {CurrencyMgr.FormatCurrency(prev + value, CurrencyMgr.GetUserCurrencyName(guildUser))}.",
                 Flags = MessageFlags.Get(ephemeral: ephemeral)
             }));
         }

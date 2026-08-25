@@ -68,10 +68,15 @@ public readonly struct Config
         get => currencySeperator;
         set => currencySeperator = value;
     }
-    [JsonInclude, JsonPropertyName(nameof(autoDeleteChannels))] private readonly u64[] _autoDeleteChannels 
+    [JsonInclude, JsonPropertyName(nameof(autoDeleteChannels))] private readonly u64[] _autoDeleteChannels
     {
         get => autoDeleteChannels;
         set => autoDeleteChannels = value;
+    }
+    [JsonInclude, JsonPropertyName(nameof(channelXpMultipliers))] private readonly Dictionary<u64, f32>_channelXpMultipliers
+    {
+        get => channelXpMultipliers;
+        set => channelXpMultipliers = value;
     }
 
 
@@ -85,6 +90,7 @@ public readonly struct Config
     public static u32 startingCurrency { get; private set; } = 0u;
     public static string currencySeperator { get; private set; } = ", ";
     public static u64[] autoDeleteChannels { get; private set; } = [];
+    public static Dictionary<u64, f32> channelXpMultipliers { get; private set; } = [];
 
 
 

@@ -2,9 +2,12 @@ namespace src.Casino;
 
 public enum CurrencySource : u8
 {
-    Play_CoinToss,
-    Challenge_RockPaperScissors,
-    Challenge_CoinToss,
+    Play_CoinTossPlus,
+    Play_CoinTossMinus,
+    Challenge_RockPaperScissorsPlus,
+    Challenge_RockPaperScissorsMinus,
+    Challenge_CoinTossPlus,
+    Challenge_CoinTossMinus,
     LevelUp,
     AdminCommand,
     DonationReceive,

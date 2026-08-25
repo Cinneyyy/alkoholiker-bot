@@ -21,7 +21,7 @@ public readonly partial struct Reply()
             ? Directory.GetFiles(App.GetPath($"res/{v}"), "*.*", SearchOption.AllDirectories)
             : [App.GetPath($"res/{v}")]
         ).ToArray();
-    }
+    } = [];
 
 
     public async Task Apply(Message message, Rule rule)

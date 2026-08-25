@@ -20,9 +20,9 @@ public readonly partial record struct Predicate()
     public u32? cooldownSeconds { get; init; } = null;
     public bool? refMessage { get; init; } = null;
     public bool? hasAttachment { get; init; } = null;
-    public u32? cooldownMinutes { init => cooldownSeconds = 60 * value; }
-    public u32? cooldownHours { init => cooldownSeconds = 60*60 * value; }
-    public string cooldown { init => cooldownSeconds = TimeStrToSeconds(value); }
+    [JsonIgnore] public u32? cooldownMinutes { init => cooldownSeconds = 60 * value; }
+    [JsonIgnore] public u32? cooldownHours { init => cooldownSeconds = 60*60 * value; }
+    [JsonIgnore] public string cooldown { init => cooldownSeconds = TimeStrToSeconds(value); }
     [JsonIgnore] public u32 actualCooldownSeconds => cooldownSeconds ?? Config.defaultRuleCooldownSeconds;
 
 

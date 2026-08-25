@@ -20,9 +20,11 @@ public sealed partial class CasinoCommands
 
             bool won = face == randomFace;
 
-            CurrencyMgr.AddCurrency(guildUser, won ? amount : -amount);
+            CurrencyMgr.AddCurrency(guildUser, won ? amount : -(i32)amount);
             LevelUpMgr.OnGamble(guildUser, amount);
-            CasinoStatsMgr.OnCurrencyChange(guildUser, CurrencySource.Play_CoinToss, amount);
+
+            if(won) CasinoStatsMgr.OnCurrencyChange(guildUser, CurrencySource.Play_CoinTossPlus, amount);
+            else CasinoStatsMgr.OnCurrencyChange(guildUser, CurrencySource.Play_CoinTossMinus, -amount);
 
             await RespondAsync(InteractionCallback.Message(new()
             {

@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace src.Rules;
 
 public readonly record struct Rule()
@@ -8,7 +10,7 @@ public readonly record struct Rule()
     public required bool @break { get; init; }
     public i32 order { get; init; } = 0;
     public bool useRandomReply { get; init; } = true;
-    public Reply randomReply
+    [JsonIgnore] public Reply randomReply
     {
         get
         {

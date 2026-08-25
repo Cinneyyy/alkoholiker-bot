@@ -104,7 +104,9 @@ public static class LevelUpMgr
 
         lastMessageTimeStamps[guildUser] = now;
 
-        return value * 2; // 0-100 => 0-200
+        Config.channelXpMultipliers.TryGetValue(message.ChannelId, out f32 channelMultiplier);
+
+        return (u32)(value * 2 * channelMultiplier); // 0-100 => 0-200
     }
 
     private static void SetStat(GuildUserPair guildUser, Stat stat, u32 value)

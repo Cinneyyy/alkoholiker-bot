@@ -73,8 +73,8 @@ public sealed class RpsButtonHandler : ComponentInteractionModule<ButtonInteract
         LevelUpMgr.OnGamble(winner, wager);
         LevelUpMgr.OnGamble(loser, wager);
 
-        CasinoStatsMgr.OnCurrencyChange(winner, CurrencySource.Challenge_RockPaperScissors, wager);
-        CasinoStatsMgr.OnCurrencyChange(loser, CurrencySource.Challenge_RockPaperScissors, -wager);
+        CasinoStatsMgr.OnCurrencyChange(winner, CurrencySource.Challenge_RockPaperScissorsPlus, wager);
+        CasinoStatsMgr.OnCurrencyChange(loser, CurrencySource.Challenge_RockPaperScissorsMinus, -wager);
 
         await RespondAsync(InteractionCallback.Message(new()
         {
