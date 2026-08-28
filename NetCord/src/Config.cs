@@ -7,7 +7,7 @@ public readonly struct Config
 {
     public enum Field
     {
-        defaultRuleCooldown,
+        defaultRuleCooldownSeconds,
         logRuleFailure,
         customEmojiFallback,
         callHistoryChannel,
@@ -16,7 +16,8 @@ public readonly struct Config
         casinoChannel,
         startingCurrency,
         currencySeperator,
-        autoDeleteChannels
+        autoDeleteChannels,
+        reactionXpCooldownSeconds
     }
 
 
@@ -73,10 +74,15 @@ public readonly struct Config
         get => autoDeleteChannels;
         set => autoDeleteChannels = value;
     }
-    [JsonInclude, JsonPropertyName(nameof(channelXpMultipliers))] private readonly Dictionary<u64, f32>_channelXpMultipliers
+    [JsonInclude, JsonPropertyName(nameof(channelXpMultipliers))] private readonly Dictionary<u64, f32> _channelXpMultipliers
     {
         get => channelXpMultipliers;
         set => channelXpMultipliers = value;
+    }
+    [JsonInclude, JsonPropertyName("reactionXpCooldown")] private readonly string _reactionXpCooldownSeconds
+    {
+        get => $"{reactionXpCooldownSeconds}s";
+        set => reactionXpCooldownSeconds = Predicate.TimeStrToSeconds(value);
     }
 
 
@@ -91,6 +97,7 @@ public readonly struct Config
     public static string currencySeperator { get; private set; } = ", ";
     public static u64[] autoDeleteChannels { get; private set; } = [];
     public static Dictionary<u64, f32> channelXpMultipliers { get; private set; } = [];
+    public static f32 reactionXpCooldownSeconds { get; private set; } = 60f;
 
 
 

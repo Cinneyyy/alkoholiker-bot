@@ -2,6 +2,7 @@ using System.Reflection;
 using NetCord;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
+using src.Ext;
 
 namespace src.Interactions;
 
@@ -24,7 +25,7 @@ public sealed partial class DebugCommands
                 PropertyInfo pInfo = typeof(Config).GetProperty(name.ToString(), BindingAttr);
                 await RespondAsync(InteractionCallback.Message(new()
                 {
-                    Content = $"`{nameof(Config)}.{pInfo.Name}` `({pInfo.PropertyType.Name})` has the value `{pInfo.GetValue(null)}`.",
+                    Content = $"`{nameof(Config)}.{pInfo.Name}` `({pInfo.PropertyType.Name})` has the value `{pInfo.GetValue(null).ToStringCatchCollection()}`.",
                     Flags = MessageFlags.Get(ephemeral: ephemeral)
                 }));
             }
@@ -54,7 +55,7 @@ public sealed partial class DebugCommands
 
                 await RespondAsync(InteractionCallback.Message(new()
                 {
-                    Content = $"Changed the value of `{nameof(Config)}.{pInfo.Name}` `({pInfo.PropertyType.Name})` from `{oldValue}` to `{value}`.",
+                    Content = $"Changed the value of `{nameof(Config)}.{pInfo.Name}` `({pInfo.PropertyType.Name})` from `{oldValue.ToStringCatchCollection()}` to `{value.ToStringCatchCollection()}`.",
                     Flags = MessageFlags.Get(ephemeral: ephemeral)
                 }));
             }
@@ -79,7 +80,7 @@ public sealed partial class DebugCommands
             {
                 Content = properties is []
                     ? $"No config properties available."
-                    : $"```\n{string.Join("\n", properties.Select(p => $"- {p.Name} ({p.PropertyType.Name}): {p.GetValue(null)}"))}```",
+                    : $"```\n{string.Join("\n", properties.Select(p => $"- {p.Name} ({p.PropertyType.Name}): {p.GetValue(null).ToStringCatchCollection()}"))}```",
                 Flags = MessageFlags.Get(ephemeral: ephemeral)
             }));
         }

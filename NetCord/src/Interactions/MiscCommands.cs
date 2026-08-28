@@ -18,6 +18,46 @@ public sealed partial class MiscCommands : ApplicationCommandModule<ApplicationC
             "$2 with $l3.",
             "And $l3 make me $l0.",
             "$0?"
+        ],
+        [Language.German] =
+        [
+            "$0?",
+            "Ich war mal $l0.",
+            "Sie packten mich in $l1.",
+            "$2",
+            "$2 mit $l3.",
+            "Und $l3 machen mich $l0.",
+            "$0?"
+        ],
+        [Language.Dutch] =
+        [
+            "$0?",
+            "Ik was eens $l0.",
+            "Ze zetten me naar $l1.",
+            "$2",
+            "$2 met $l3.",
+            "En $l3 maken me $l0.",
+            "$0?"
+        ],
+        [Language.Alien] =
+        [
+            "$0?",
+            "Glorp zoop na \"$l0\" glorp glorp.",
+            "Bogos binted $l1.",
+            "$2",
+            "$2 👽👽👽 $l3.",
+            "Zeep $l3 oioeooeoeoo \"$l0\".",
+            "$0?"
+        ],
+        [Language.Pirate] =
+        [
+            "$0?",
+            "Me lass was $l0 once.",
+            "They be puttin' 'er in $l1.",
+            "$2",
+            "$2 full o' $l3.",
+            "And, lett'e tell ya laddie, $l3 be makin all me ship $l0.",
+            "$0?"
         ]
     };
 

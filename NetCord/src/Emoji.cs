@@ -21,9 +21,9 @@ public readonly partial record struct Emoji
 
 
     public override string ToString()
-        => string.IsNullOrWhiteSpace(name)
-            ? $"<:custom:{id}>"
-            : $":{name}:";
+        => id != 0ul
+            ? $"<:{name ?? "custom"}:{id}>"
+            : $"{name}";
 
     public EmojiProperties ToEmojiProperties()
         => id != 0ul

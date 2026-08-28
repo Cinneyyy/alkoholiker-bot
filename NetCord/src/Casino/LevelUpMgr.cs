@@ -49,6 +49,17 @@ public static class LevelUpMgr
         _ = CasinoMgr.OnLevelUp(guildUser, level, reward);
     }
 
+    public static void TakeXp(GuildUserPair guildUser, i32 amount)
+    {
+        if(amount == 0)
+            return;
+
+        u32 xp = GetStat(guildUser, Stat.Xp);
+        u32 newXp = (u32)i32.Max(0, (i32)xp - amount);
+
+        SetStat(guildUser, Stat.Xp, newXp);
+    }
+
     public static u32 GetXpAmountFromHours(f32 hours)
         => (u32)(125f * hours);
 
@@ -104,7 +115,8 @@ public static class LevelUpMgr
 
         lastMessageTimeStamps[guildUser] = now;
 
-        Config.channelXpMultipliers.TryGetValue(message.ChannelId, out f32 channelMultiplier);
+        if(!Config.channelXpMultipliers.TryGetValue(message.ChannelId, out f32 channelMultiplier))
+            channelMultiplier = 1f;
 
         return (u32)(value * 2 * channelMultiplier); // 0-100 => 0-200
     }
@@ -117,4 +129,20 @@ public static class LevelUpMgr
 
     public static void OnGamble(GuildUserPair user, u32 amount)
         => GiveXp(user, 5u + 20u * (u32)f32.Clamp(amount / 10000f, 0f, 1f));
+
+    public static void OnReaction(GuildUserPair giver, GuildUserPair author, Emoji reaction)
+    {
+        GiveXp(giver, amountRaw: 10u);
+
+        i32 xp = reaction.name switch
+        {
+            "⬆️" => 30,
+            "⬇️" => -15,
+            "⭐" => 50,
+            _ => 15,
+        };
+
+        if(xp < 0) TakeXp(author, xp);
+        else GiveXp(author, amountRaw: (u32)xp);
+    }
 }
